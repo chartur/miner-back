@@ -88,4 +88,23 @@ export class UsersService {
       user: userEntity,
     };
   }
+
+  public async syncTest(tUserId: string): Promise<AuthUserDto> {
+    this.logger.log('[User] sync user data TEST', {
+      tUserId,
+    });
+
+    const userEntity = await this.userEntityRepository.findOne({
+      where: {
+        tUserId,
+      },
+      relations: ['wallet', 'boost'],
+    });
+
+    const token = await this.authService.signIn(userEntity);
+    return {
+      token,
+      user: userEntity,
+    };
+  }
 }

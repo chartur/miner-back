@@ -4,6 +4,7 @@ import { UserEntity } from '../../entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
+import numeral from 'numeral';
 import {
   boostLevelValues,
   periodWithSeconds,
@@ -92,9 +93,10 @@ export class WalletService {
       amount = boostValues.amountPerSecond * seconds;
     }
 
+    wallet.claimCount++;
     wallet.lastClaimDateTime = now.toDate();
     const tonValue = amount / tonByNonoton + wallet.tons;
-    wallet.tons = Number(tonValue.toFixed(7));
+    wallet.tons = Number(numeral(tonValue).format('0.0000'));
     return this.walletEntityRepository.save(wallet);
   }
 }

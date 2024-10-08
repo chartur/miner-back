@@ -24,6 +24,13 @@ export class WalletEntity {
   @OneToOne(() => UserEntity, (user) => user.wallet, { lazy: true })
   user: Promise<UserEntity>;
 
+  @ApiProperty({
+    example: 3,
+    description: 'Claim count',
+  })
+  @Column({ default: 0 })
+  claimCount: number;
+
   @ApiProperty({ example: 3, description: 'Tons count in wallet' })
   @Column({ default: 0, type: 'float' })
   tons: number;

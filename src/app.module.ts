@@ -6,9 +6,10 @@ import { AppController } from './app.controller';
 import { AppService } from './app.service';
 import { UsersModule } from '../routes/users/users.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
-import { APP_GUARD } from '@nestjs/core';
 import { ParseUserGuard } from '../shared/guards/parse-user.guard';
-import { RefsModule } from "../routes/refs/refs.module";
+import { RefsModule } from '../routes/refs/refs.module';
+import { WalletModule } from '../routes/wallet/wallet.module';
+import { BoostModule } from "../routes/boost/boost.module";
 
 @Module({
   imports: [
@@ -34,6 +35,8 @@ import { RefsModule } from "../routes/refs/refs.module";
     }),
     UsersModule,
     RefsModule,
+    WalletModule,
+    BoostModule,
   ],
   providers: [AppService, JwtService, ParseUserGuard],
   controllers: [AppController],

@@ -53,7 +53,7 @@ export class RefsService {
           id: userId,
         },
       },
-      relations: ['referral', 'referrer'],
+      relations: ['referral'],
     });
   }
 }

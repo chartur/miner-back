@@ -9,7 +9,8 @@ import { Language } from '../../core/models/enums/language';
 import { AuthService } from '../../shared/services/auth.service';
 import { AuthUserDto } from '../../core/models/dto/response/auth-user.dto';
 import { DynamicSyncData } from '../../core/models/interfaces/dynamic-sync-data';
-import { RefsService } from "../refs/refs.service";
+import { RefsService } from '../refs/refs.service';
+import { WalletEntity } from '../../entites/wallet.entity';
 
 @Injectable()
 export class UsersService {
@@ -20,7 +21,7 @@ export class UsersService {
     private userEntityRepository: Repository<UserEntity>,
     private telegramService: TelegramService,
     private authService: AuthService,
-    private refsService: RefsService
+    private refsService: RefsService,
   ) {}
 
   public async sync(syncData: SyncUserDto, ref?: string): Promise<AuthUserDto> {
@@ -44,6 +45,7 @@ export class UsersService {
       where: {
         tUserId: user.id.toString(),
       },
+      relations: ['wallet', 'boost'],
     });
     const newUserData = {
       tUserId: user.id.toString(),
@@ -54,17 +56,25 @@ export class UsersService {
     };
 
     if (!existingUserData) {
-      userEntity = await this.userEntityRepository.save(newUserData);
+      userEntity = await this.userEntityRepository.save({
+        ...newUserData,
+        wallet: new WalletEntity(),
+      });
       if (ref) {
         this.refsService.create(userEntity, ref);
       }
     } else {
+      if (!existingUserData.wallet) {
+        existingUserData.wallet = new WalletEntity();
+        await this.userEntityRepository.save(existingUserData);
+      }
       const isSame = Object.keys(newUserData).every(
         (key) => existingUserData[key] === newUserData[key],
       );
       if (isSame) {
         userEntity = existingUserData;
       } else {
+        // eslint-disable-next-line @typescript-eslint/no-unused-vars
         userEntity = await this.userEntityRepository.save({
           ...existingUserData,
           ...newUserData,

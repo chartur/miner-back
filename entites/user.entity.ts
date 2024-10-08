@@ -11,10 +11,12 @@ import {
 import { Language } from '../core/models/enums/language';
 import { ApiProperty } from '@nestjs/swagger';
 import { RefEntity } from './ref.entity';
+import { WalletEntity } from './wallet.entity';
+import { BoostEntity } from './boost.entity';
 
 @Entity('users')
 export class UserEntity {
-  @ApiProperty({ example: 3, description: 'Internal ID of user' })
+  @ApiProperty({ example: '3', description: 'Internal ID of user' })
   @PrimaryGeneratedColumn('increment', { type: 'bigint' })
   id: string;
 
@@ -43,6 +45,20 @@ export class UserEntity {
   })
   @Column({ type: 'enum', enum: Language, default: Language.EN })
   languageCode: Language;
+
+  @ApiProperty({
+    example: WalletEntity,
+    description: 'The wallet of current user',
+  })
+  @OneToOne(() => WalletEntity, (wallet) => wallet.user, { cascade: true })
+  wallet: WalletEntity;
+
+  @ApiProperty({
+    example: BoostEntity,
+    description: 'The boost of current user',
+  })
+  @OneToOne(() => BoostEntity, (boost) => boost.user, { cascade: true })
+  boost?: BoostEntity;
 
   @ApiProperty({
     example: [RefEntity],

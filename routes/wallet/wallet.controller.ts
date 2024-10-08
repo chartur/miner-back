@@ -5,6 +5,7 @@ import { AuthUser } from '../../core/decorators/auth-user';
 import { UserEntity } from '../../entites/user.entity';
 import { WalletService } from './wallet.service';
 import { WalletEntity } from '../../entites/wallet.entity';
+import { GetCurrencyRateDtoResponse } from '../../core/models/dto/response/get-currency-rate.dto.response';
 
 @ApiTags('Wallet')
 @ApiBearerAuth()
@@ -33,5 +34,16 @@ export class WalletController {
   @Put('/claim')
   public claim(@AuthUser() authUser: UserEntity): Promise<WalletEntity> {
     return this.walletService.claim(authUser);
+  }
+
+  @ApiResponse({
+    status: 201,
+    type: GetCurrencyRateDtoResponse,
+    description: 'The records successfully loaded.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @Get('/rates')
+  public getRates(): Promise<GetCurrencyRateDtoResponse | { error: string }> {
+    return this.walletService.getRates();
   }
 }

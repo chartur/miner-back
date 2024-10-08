@@ -18,7 +18,6 @@ export class ParseUserGuard implements CanActivate {
       const user = this.jwtService.decode<UserEntity>(authToken);
       (request as any).user = user;
     }
-    console.log((request as any).user, 'GLOBAL_GUARD');
     return true;
   }
 }

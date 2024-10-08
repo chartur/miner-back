@@ -1,9 +1,12 @@
-import { Injectable } from '@nestjs/common';
+import { Injectable, Scope } from '@nestjs/common';
 import { TelegramActions } from '../../utils/telegram-actions';
 import { TelegramActionTypes } from '../../core/models/enums/telegram-action-types';
 import { Telegraf } from 'telegraf';
+import { TelegramChannelUserValidTypes } from '../../core/models/enums/telegram-channel-user-valid-types';
 
-@Injectable()
+@Injectable({
+  scope: Scope.DEFAULT,
+})
 export class TelegramService {
   private _telegramAction: TelegramActions;
   private _bot: Telegraf;
@@ -40,8 +43,6 @@ export class TelegramService {
     this._bot.on('callback_query', (ctx) => {
       const action: string = (ctx.callbackQuery as any).data;
       switch (action) {
-        case TelegramActionTypes.JOIN_CHANNEL:
-          return this._telegramAction.joinCommunityChannelHandler(ctx);
         case TelegramActionTypes.SEND_INVOICE:
           return this._telegramAction.sendInvoice(ctx);
       }
@@ -63,5 +64,15 @@ export class TelegramService {
     }
 
     return null;
+  }
+
+  public isUserSubscribedToCommunityChannel(tUserId: string): Promise<boolean> {
+    return this._bot.telegram
+      .getChatMember(this._telegramAction.tChannelId, Number(tUserId))
+      .then((res) =>
+        Object.values(TelegramChannelUserValidTypes).includes(
+          res.status as TelegramChannelUserValidTypes,
+        ),
+      );
   }
 }

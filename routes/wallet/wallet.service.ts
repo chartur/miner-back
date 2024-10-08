@@ -4,14 +4,20 @@ import { UserEntity } from '../../entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
-import numeral from 'numeral';
+import * as numeral from 'numeral';
 import {
   boostLevelValues,
   periodWithSeconds,
   tonByNonoton,
+  unsubscribedClaimCount,
 } from '../../core/constants/boost-level-values';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
 import { BoostEntity } from '../../entites/boost.entity';
+import { TelegramService } from '../../shared/services/telegram.service';
+import { HttpFailureActionTypes } from '../../core/models/enums/http-failure-action-types';
+import { GetCurrencyRateDtoResponse } from '../../core/models/dto/response/get-currency-rate.dto.response';
+import { HttpService } from '@nestjs/axios';
+import { firstValueFrom } from 'rxjs';
 
 @Injectable()
 export class WalletService {
@@ -22,6 +28,8 @@ export class WalletService {
     private walletEntityRepository: Repository<WalletEntity>,
     @InjectRepository(BoostEntity)
     private boostEntityRepository: Repository<BoostEntity>,
+    private telegramService: TelegramService,
+    private httpService: HttpService,
   ) {}
 
   public async getMyWallet(authUser: UserEntity): Promise<WalletEntity> {
@@ -46,6 +54,23 @@ export class WalletService {
       },
     });
 
+    if (wallet.claimCount >= unsubscribedClaimCount) {
+      const isSubscribed =
+        await this.telegramService.isUserSubscribedToCommunityChannel(
+          authUser.tUserId,
+        );
+      if (!isSubscribed) {
+        throw new HttpException(
+          {
+            action: HttpFailureActionTypes.NEED_TO_SUBSCRIBE_CHANNEL,
+            message:
+              'To continue claim you profit you need to be subscribed our community channel',
+          },
+          HttpStatus.BAD_REQUEST,
+        );
+      }
+    }
+
     const now = moment();
     if (!wallet.lastClaimDateTime) {
       wallet.lastClaimDateTime = now.toDate();
@@ -58,7 +83,8 @@ export class WalletService {
     ) {
       throw new HttpException(
         {
-          message: 'you can not claim your profit before 5 hours',
+          action: HttpFailureActionTypes.CLAIM_BEFORE_EXPECTED_TIME,
+          message: 'You can not claim your profit before 5 hours',
         },
         HttpStatus.BAD_REQUEST,
       );
@@ -98,5 +124,13 @@ export class WalletService {
     const tonValue = amount / tonByNonoton + wallet.tons;
     wallet.tons = Number(numeral(tonValue).format('0.0000'));
     return this.walletEntityRepository.save(wallet);
+  }
+
+  public getRates(): Promise<GetCurrencyRateDtoResponse | { error: string }> {
+    return firstValueFrom(
+      this.httpService.get<GetCurrencyRateDtoResponse>(
+        process.env.GET_CURRENCY_RATE_LINK,
+      ),
+    ).then((res) => res.data);
   }
 }

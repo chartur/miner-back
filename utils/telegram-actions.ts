@@ -1,11 +1,11 @@
 import { Context, Markup, Telegraf } from 'telegraf';
-import { TelegramActionTypes } from '../core/models/enums/telegram-action-types';
 
 export class TelegramActions {
+  public readonly tChannelLink = process.env.telegramChannelLink;
+  public readonly tChannelId = process.env.telegramChannelId;
   private _bot: Telegraf;
   private readonly telegramKey = process.env.telegramKey;
   private readonly appUrl = process.env.appUrl;
-  private readonly tChannelLink = process.env.telegramChannelLink;
   private readonly botLink = process.env.telegramBotLink;
   private readonly channelusername = '+Bt5aFCboM-k2MzMy';
   private readonly logoUrl = process.env.telegramLogoUrl;
@@ -46,14 +46,12 @@ export class TelegramActions {
       startButtonText = this.languageBasedText[lang].startAppButtonFromRef;
     }
 
-    console.log(appUrl.toString());
-
     const markup = Markup.inlineKeyboard(
       [
         Markup.button.webApp(startButtonText, appUrl.toString()),
-        Markup.button.callback(
+        Markup.button.url(
           this.languageBasedText[lang].joinCommunity,
-          TelegramActionTypes.JOIN_CHANNEL,
+          this.tChannelLink,
         ),
       ],
       {
@@ -70,18 +68,6 @@ export class TelegramActions {
       {
         ...markup,
         caption: 'TEST',
-      },
-    );
-  }
-
-  public joinCommunityChannelHandler(ctx): void {
-    const markup = Markup.inlineKeyboard([
-      Markup.button.url('👋 Միանալ ալիքին', this.tChannelLink),
-    ]);
-    ctx.sendMessage(
-      'Միացիր galad.am ալիքին և ստացիր վերջին նորթյունները մեր տեսականու և զեղչերի վերաբերյալ։',
-      {
-        ...markup,
       },
     );
   }

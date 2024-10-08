@@ -9,7 +9,8 @@ import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ParseUserGuard } from '../shared/guards/parse-user.guard';
 import { RefsModule } from '../routes/refs/refs.module';
 import { WalletModule } from '../routes/wallet/wallet.module';
-import { BoostModule } from "../routes/boost/boost.module";
+import { BoostModule } from '../routes/boost/boost.module';
+import { GlobalServiceModule } from '../shared/global-service.module';
 
 @Module({
   imports: [
@@ -33,6 +34,7 @@ import { BoostModule } from "../routes/boost/boost.module";
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '6h' },
     }),
+    GlobalServiceModule,
     UsersModule,
     RefsModule,
     WalletModule,

@@ -107,4 +107,13 @@ export class UsersService {
       user: userEntity,
     };
   }
+
+  public async isUserSubscribed(authUser: UserEntity): Promise<void> {
+    const isSubscribed =
+      await this.telegramService.isUserSubscribedToCommunityChannel(
+        authUser.tUserId,
+      );
+    console.log(isSubscribed);
+    return;
+  }
 }

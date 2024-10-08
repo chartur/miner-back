@@ -1,8 +1,11 @@
-import { Body, Controller, Put, Query } from '@nestjs/common';
-import { ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
+import { Body, Controller, Get, Put, Query, UseGuards } from '@nestjs/common';
+import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { SyncUserDto } from '../../core/models/dto/sync-user.dto';
 import { AuthUserDto } from '../../core/models/dto/response/auth-user.dto';
+import { AuthUser } from '../../core/decorators/auth-user';
+import { UserEntity } from '../../entites/user.entity';
+import { AuthGuard } from '../../shared/guards/auth.guard';
 
 @ApiTags('Users')
 @Controller('users')
@@ -27,5 +30,18 @@ export class UsersController {
   @Put('sync/test')
   public syncTest(@Query('tUserId') tUserId: string): Promise<AuthUserDto> {
     return this.usersService.syncTest(tUserId);
+  }
+
+  @ApiResponse({
+    status: 200,
+    type: void 0,
+    description: 'The user already subscribed',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('check-subscription')
+  public isUserSubscribed(@AuthUser() authUser: UserEntity) {
+    return this.usersService.isUserSubscribed(authUser);
   }
 }

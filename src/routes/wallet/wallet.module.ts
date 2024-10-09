@@ -8,6 +8,7 @@ import { AuthGuard } from '../../shared/guards/auth.guard';
 import { BoostEntity } from '../../entites/boost.entity';
 import { GlobalServiceModule } from '../../shared/global-service.module';
 import { HttpModule } from '@nestjs/axios';
+import { RefEntity } from '../../entites/ref.entity';
 
 @Module({
   controllers: [WalletController],
@@ -15,7 +16,13 @@ import { HttpModule } from '@nestjs/axios';
   imports: [
     GlobalServiceModule,
     HttpModule,
-    TypeOrmModule.forFeature([WalletEntity, UserEntity, BoostEntity]),
+    TypeOrmModule.forFeature([
+      WalletEntity,
+      UserEntity,
+      BoostEntity,
+      UserEntity,
+      RefEntity,
+    ]),
   ],
 })
 export class WalletModule {}

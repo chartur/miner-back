@@ -1,9 +1,8 @@
-import { NestFactory } from '@nestjs/core';
+import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { DocumentBuilder, SwaggerModule } from '@nestjs/swagger';
-import { join } from "path";
-import { ValidationPipe } from "@nestjs/common";
-import { ParseUserGuard } from "../shared/guards/parse-user.guard";
+import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
+import { ParseUserGuard } from './shared/guards/parse-user.guard';
 
 async function bootstrap() {
   const app = await NestFactory.create(AppModule);
@@ -18,6 +17,7 @@ async function bootstrap() {
   SwaggerModule.setup('api', app, document);
 
   app.useGlobalGuards(app.get(ParseUserGuard));
+  app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
 
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ transform: true }));

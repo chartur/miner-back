@@ -65,7 +65,7 @@ export class UserEntity {
     description: 'Users list which current user invited',
   })
   @OneToMany(() => RefEntity, (ref) => ref.referrer)
-  references: RefEntity[];
+  referrals: RefEntity[];
 
   @ApiProperty({
     example: RefEntity,

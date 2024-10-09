@@ -5,6 +5,7 @@ import { RefsService } from './refs.service';
 import { AuthGuard } from '../../shared/guards/auth.guard';
 import { AuthUser } from '../../core/decorators/auth-user';
 import { UserEntity } from '../../entites/user.entity';
+import { RefsProfitDto } from '../../core/models/dto/response/refs-profit.dto';
 
 @ApiTags('refs')
 @Controller('refs')
@@ -22,5 +23,18 @@ export class RefsController {
   @Get('/my')
   public getMyRefs(@AuthUser() user: UserEntity): Promise<RefEntity[]> {
     return this.refsService.getMyRefs(user.id);
+  }
+
+  @ApiResponse({
+    status: 201,
+    type: RefsProfitDto,
+    description: 'The records successfully loaded.',
+  })
+  @ApiResponse({ status: 401, description: 'Unauthorized' })
+  @ApiBasicAuth()
+  @UseGuards(AuthGuard)
+  @Get('/profit')
+  public getRefsProfit(@AuthUser() user: UserEntity): Promise<RefsProfitDto> {
+    return this.refsService.getRefsProfit(user);
   }
 }

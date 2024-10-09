@@ -2,14 +2,13 @@ import {
   Column,
   CreateDateColumn,
   Entity,
-  JoinColumn,
   ManyToOne,
-  OneToMany,
   PrimaryGeneratedColumn,
   UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
+import { Exclude } from 'class-transformer';
 
 @Entity('refs')
 export class RefEntity {
@@ -49,20 +48,12 @@ export class RefEntity {
   @ApiProperty({
     type: 'int',
     example: 3000000,
-    description: 'Received revenue with nonoton',
-    default: 0,
-  })
-  @Column({ type: 'int', default: 0 })
-  revenueWithNonoton: number;
-
-  @ApiProperty({
-    type: 'int',
-    example: 3000000,
     description:
       'The nonoton that came from referral user but is not claimed yet',
     default: 0,
   })
-  @Column({ type: 'int', default: 0, select: false })
+  @Column({ type: 'float', default: 0 })
+  @Exclude()
   nonClaimedRevenue: number;
 
   @ApiProperty({

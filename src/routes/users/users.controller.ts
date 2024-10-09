@@ -33,6 +33,19 @@ export class UsersController {
   }
 
   @ApiResponse({
+    status: 201,
+    type: AuthUserDto,
+    description: 'The record has been successfully loaded.',
+  })
+  @ApiResponse({ status: 403, description: 'Forbidden' })
+  @ApiBearerAuth()
+  @UseGuards(AuthGuard)
+  @Get('me')
+  public me(@AuthUser() authUser: UserEntity): Promise<UserEntity> {
+    return this.usersService.me(authUser);
+  }
+
+  @ApiResponse({
     status: 200,
     type: void 0,
     description: 'The user already subscribed',

@@ -48,6 +48,17 @@ export class WalletEntity {
 
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',
+    description: 'The Last claim datetime of refs profit',
+  })
+  @Column({
+    nullable: true,
+    type: 'timestamp with time zone',
+    default: 'NOW()',
+  })
+  lastRefsClaimDateTime: Date;
+
+  @ApiProperty({
+    example: '2011-10-05T14:48:00.000Z',
     description: 'Creation date',
   })
   @CreateDateColumn()

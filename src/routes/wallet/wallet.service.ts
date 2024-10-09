@@ -18,6 +18,7 @@ import { HttpFailureActionTypes } from '../../core/models/enums/http-failure-act
 import { GetCurrencyRateDtoResponse } from '../../core/models/dto/response/get-currency-rate.dto.response';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
+import { RefEntity } from '../../entites/ref.entity';
 
 @Injectable()
 export class WalletService {
@@ -28,6 +29,10 @@ export class WalletService {
     private walletEntityRepository: Repository<WalletEntity>,
     @InjectRepository(BoostEntity)
     private boostEntityRepository: Repository<BoostEntity>,
+    @InjectRepository(UserEntity)
+    private userEntityRepository: Repository<UserEntity>,
+    @InjectRepository(RefEntity)
+    private refEntityRepository: Repository<RefEntity>,
     private telegramService: TelegramService,
     private httpService: HttpService,
   ) {}
@@ -119,10 +124,39 @@ export class WalletService {
       amount = boostValues.amountPerSecond * seconds;
     }
 
+    const referrer = await this.refEntityRepository.findOne({
+      where: {
+        referral: {
+          id: authUser.id,
+        },
+      },
+      relations: {
+        referrer: {
+          boost: true,
+          wallet: true,
+        },
+      },
+    });
+
+    if (referrer) {
+      const lastRefClaimDateTime = moment(
+        referrer.referrer.wallet.lastRefsClaimDateTime,
+      );
+      if (lastRefClaimDateTime.add(1, 'weeks').isAfter(now)) {
+        let boostLevel = BoostLevels.USUAL;
+        if (referrer.referrer?.boost) {
+          boostLevel = referrer.referrer.boost.boostLevel;
+        }
+        const percent = boostLevelValues[boostLevel].refCashback;
+        referrer.nonClaimedRevenue += (amount * percent) / 100;
+        await this.refEntityRepository.save(referrer);
+      }
+    }
+
     wallet.claimCount++;
     wallet.lastClaimDateTime = now.toDate();
     const tonValue = amount / tonByNonoton + wallet.tons;
-    wallet.tons = Number(numeral(tonValue).format('0.0000'));
+    wallet.tons = Number(numeral(tonValue).format('0.[0000]'));
     return this.walletEntityRepository.save(wallet);
   }
 

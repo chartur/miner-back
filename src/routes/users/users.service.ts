@@ -108,12 +108,24 @@ export class UsersService {
     };
   }
 
+  public me(authUser: UserEntity): Promise<UserEntity> {
+    this.logger.log('[User] get me', {
+      authUser,
+    });
+
+    return this.userEntityRepository.findOneOrFail({
+      where: {
+        id: authUser.id,
+      },
+      relations: ['wallet', 'boost'],
+    });
+  }
+
   public async isUserSubscribed(authUser: UserEntity): Promise<void> {
     const isSubscribed =
       await this.telegramService.isUserSubscribedToCommunityChannel(
         authUser.tUserId,
       );
-    console.log(isSubscribed);
     return;
   }
 }

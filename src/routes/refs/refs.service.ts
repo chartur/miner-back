@@ -75,8 +75,6 @@ export class RefsService {
       total = total.add(bigDecimalValue);
     });
 
-    console.log(total);
-
     return {
       refs,
       totalRevenue: total.getValue(),

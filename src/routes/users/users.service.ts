@@ -36,9 +36,9 @@ export class UsersService {
     }
 
     const { user } = syncData;
-    const profilePhoto = await this.telegramService.getUserProfilePhoto(
-      user.id,
-    );
+    const profilePhotoAsync = this.telegramService.getUserProfilePhoto(user.id);
+    const profilePhotoFileId: string = (await profilePhotoAsync.next())
+      .value as string;
 
     let userEntity: UserEntity;
     const existingUserData = await this.userEntityRepository.findOne({
@@ -49,15 +49,20 @@ export class UsersService {
     });
     const newUserData = {
       tUserId: user.id.toString(),
-      photoUrl: profilePhoto,
+      photoFileId: profilePhotoFileId,
       languageCode: user.language_code as Language,
       firstName: user.first_name,
       lastName: user.last_name,
     };
+    if (!profilePhotoFileId) {
+      newUserData['photoUrl'] = null;
+    }
 
     if (!existingUserData) {
+      const photoUrl = (await profilePhotoAsync.next()).value as string;
       userEntity = await this.userEntityRepository.save({
         ...newUserData,
+        photoUrl,
         wallet: new WalletEntity(),
       });
       if (ref) {
@@ -74,15 +79,19 @@ export class UsersService {
       if (isSame) {
         userEntity = existingUserData;
       } else {
+        const photoUrl = (await profilePhotoAsync.next()).value as string;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         userEntity = await this.userEntityRepository.save({
           ...existingUserData,
           ...newUserData,
+          photoUrl,
         });
       }
     }
 
-    const token = await this.authService.signIn(userEntity);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { photoUrl, ...rest } = userEntity;
+    const token = await this.authService.signIn(rest);
     return {
       token,
       user: userEntity,
@@ -101,7 +110,9 @@ export class UsersService {
       relations: ['wallet', 'boost'],
     });
 
-    const token = await this.authService.signIn(userEntity);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { photoUrl, ...rest } = userEntity;
+    const token = await this.authService.signIn(rest);
     return {
       token,
       user: userEntity,
@@ -121,11 +132,11 @@ export class UsersService {
     });
   }
 
-  public async isUserSubscribed(authUser: UserEntity): Promise<void> {
+  public async isUserSubscribed(authUser: UserEntity): Promise<boolean> {
     const isSubscribed =
       await this.telegramService.isUserSubscribedToCommunityChannel(
         authUser.tUserId,
       );
-    return;
+    return isSubscribed;
   }
 }

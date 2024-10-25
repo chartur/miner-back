@@ -33,11 +33,18 @@ export class UserEntity {
   lastName: string;
 
   @ApiProperty({
-    example: 'https://api.telegram.com/file/sdfadsf.png',
-    description: 'Telegram photo url of user',
+    example: 'data://asdfaghfiuaydhsfjbakdf...',
+    description: 'Telegram photo blob data of user',
   })
   @Column({ nullable: true, type: 'text' })
   photoUrl?: string;
+
+  @ApiProperty({
+    example: '123124245982190384092',
+    description: 'Telegram photo file id',
+  })
+  @Column({ nullable: true, type: 'text' })
+  photoFileId?: string;
 
   @ApiProperty({
     example: Language.EN,

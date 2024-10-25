@@ -6,7 +6,7 @@ import { UserEntity } from '../../entites/user.entity';
 export class AuthService {
   constructor(private jwtService: JwtService) {}
 
-  async signIn(user: UserEntity): Promise<string> {
+  async signIn(user: Partial<UserEntity>): Promise<string> {
     return await this.jwtService.signAsync({
       ...user,
     });

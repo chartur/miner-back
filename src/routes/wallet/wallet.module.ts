@@ -9,10 +9,11 @@ import { BoostEntity } from '../../entites/boost.entity';
 import { GlobalServiceModule } from '../../shared/global-service.module';
 import { HttpModule } from '@nestjs/axios';
 import { RefEntity } from '../../entites/ref.entity';
+import { RefsService } from "../refs/refs.service";
 
 @Module({
   controllers: [WalletController],
-  providers: [WalletService, AuthGuard],
+  providers: [WalletService, AuthGuard, RefsService],
   imports: [
     GlobalServiceModule,
     HttpModule,

@@ -1,17 +1,20 @@
-import { Injectable, Scope } from '@nestjs/common';
+import { Injectable, Logger, Scope } from '@nestjs/common';
 import { TelegramActions } from '../../utils/telegram-actions';
 import { TelegramActionTypes } from '../../core/models/enums/telegram-action-types';
 import { Telegraf } from 'telegraf';
 import { TelegramChannelUserValidTypes } from '../../core/models/enums/telegram-channel-user-valid-types';
+import { HttpService } from '@nestjs/axios';
+import { lastValueFrom } from 'rxjs';
 
 @Injectable({
   scope: Scope.DEFAULT,
 })
 export class TelegramService {
+  private logger = new Logger(TelegramService.name);
   private _telegramAction: TelegramActions;
   private _bot: Telegraf;
 
-  constructor() {
+  constructor(private httpService: HttpService) {
     this.init();
   }
 
@@ -51,16 +54,28 @@ export class TelegramService {
     this._bot.launch();
   }
 
-  public async getUserProfilePhoto(
+  public async *getUserProfilePhoto(
     telegramUserId: number,
-  ): Promise<string | null> {
+  ): AsyncGenerator<string | null, string | null, void> {
     const photo = await this._bot.telegram
       .getUserProfilePhotos(telegramUserId, 0, 1)
       .then((res) => (res.total_count > 0 ? res.photos[0][0] : undefined));
 
+    yield photo?.file_id || null;
+
     if (photo) {
       const data = await this._bot.telegram.getFileLink(photo.file_id);
-      return data?.href;
+
+      if (data.href) {
+        return await lastValueFrom(
+          this.httpService.get<Buffer>(data.href, {
+            responseType: 'arraybuffer',
+          }),
+        ).then((res) => {
+          const base64 = Buffer.from(res.data).toString('base64');
+          return `data:image/png;base64, ${base64}`;
+        });
+      }
     }
 
     return null;

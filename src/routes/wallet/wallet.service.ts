@@ -19,6 +19,7 @@ import { GetCurrencyRateDtoResponse } from '../../core/models/dto/response/get-c
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { RefEntity } from '../../entites/ref.entity';
+import BigDecimal from "js-big-decimal";
 
 @Injectable()
 export class WalletService {
@@ -156,7 +157,9 @@ export class WalletService {
     wallet.claimCount++;
     wallet.lastClaimDateTime = now.toDate();
     const tonValue = amount / tonByNonoton + wallet.tons;
-    wallet.tons = Number(numeral(tonValue).format('0.[0000]'));
+    wallet.tons = parseFloat(
+      new BigDecimal(tonValue).round(6).stripTrailingZero().getValue()
+    );
     return this.walletEntityRepository.save(wallet);
   }
 

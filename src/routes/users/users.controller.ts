@@ -1,4 +1,4 @@
-import { Body, Controller, Get, Put, Query, UseGuards } from '@nestjs/common';
+import { Body, Controller, Get, Put, Query, Res, UseGuards } from "@nestjs/common";
 import { ApiBearerAuth, ApiQuery, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { UsersService } from './users.service';
 import { SyncUserDto } from '../../core/models/dto/sync-user.dto';
@@ -54,7 +54,7 @@ export class UsersController {
   @ApiBearerAuth()
   @UseGuards(AuthGuard)
   @Get('check-subscription')
-  public isUserSubscribed(@AuthUser() authUser: UserEntity) {
+  public isUserSubscribed(@AuthUser() authUser: UserEntity): Promise<boolean> {
     return this.usersService.isUserSubscribed(authUser);
   }
 }

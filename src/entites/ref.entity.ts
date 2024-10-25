@@ -42,7 +42,7 @@ export class RefEntity {
     description: 'Received revenue with Ton',
     default: 0,
   })
-  @Column({ type: 'int', default: 0 })
+  @Column({ type: 'float', default: 0 })
   revenueWithTon: number;
 
   @ApiProperty({

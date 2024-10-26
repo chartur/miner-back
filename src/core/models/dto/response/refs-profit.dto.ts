@@ -2,6 +2,6 @@ import { UserEntity } from '../../../../entites/user.entity';
 
 export class RefsProfitDto {
   users: Partial<UserEntity>[];
-  total: number;
+  total: string;
   moreUsersCount: number;
 }

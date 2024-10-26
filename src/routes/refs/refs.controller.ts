@@ -1,13 +1,12 @@
 import { Controller, Get, Post, UseGuards } from '@nestjs/common';
 import { ApiBasicAuth, ApiResponse, ApiTags } from '@nestjs/swagger';
-import { RefEntity } from '../../entites/ref.entity';
 import { RefsService } from './refs.service';
 import { AuthGuard } from '../../shared/guards/auth.guard';
 import { AuthUser } from '../../core/decorators/auth-user';
 import { UserEntity } from '../../entites/user.entity';
 import { RefsProfitDto } from '../../core/models/dto/response/refs-profit.dto';
 import { WalletEntity } from '../../entites/wallet.entity';
-import { MyRefsDto } from "../../core/models/dto/response/my-refs.dto";
+import { MyRefsDto } from '../../core/models/dto/response/my-refs.dto';
 
 @ApiTags('refs')
 @Controller('refs')

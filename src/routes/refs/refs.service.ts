@@ -7,7 +7,7 @@ import { RefsProfitDto } from '../../core/models/dto/response/refs-profit.dto';
 import * as moment from 'moment';
 import { WalletEntity } from '../../entites/wallet.entity';
 import BigDecimal from 'js-big-decimal';
-import { MyRefsDto } from "../../core/models/dto/response/my-refs.dto";
+import { MyRefsDto } from '../../core/models/dto/response/my-refs.dto';
 
 @Injectable()
 export class RefsService {
@@ -71,7 +71,6 @@ export class RefsService {
         .round(6)
         .stripTrailingZero();
       ref.revenueWithTon = parseFloat(bigDecimalValue.getValue());
-      console.log(bigDecimalValue);
       total = total.add(bigDecimalValue);
     });
 
@@ -111,11 +110,13 @@ export class RefsService {
     const users = await this.refEntityRepository
       .createQueryBuilder('refs')
       .leftJoinAndSelect('refs.referral', 'referral')
-      .addSelect('referral.photoUrl', 'photoUrl')
-      .addSelect('referral.firstName', 'firstName')
-      .addSelect('referral.lastName', 'lastName')
-      .addSelect('COUNT(*) OVER()', 'totalCount')
-      .orderBy('RANDOM()') // Use RAND() for MySQL
+      .select([
+        'referral.photoUrl as "photoUrl"',
+        'referral.firstName as "firstName"',
+        'referral.lastName as "lastName"',
+        'COUNT(*) OVER() as "totalCount"',
+      ])
+      .orderBy('RANDOM()')
       .limit(3)
       .where('refs.referrerId = :userId', { userId: user.id })
       .getRawMany<Partial<UserEntity & { totalCount: number }>>();
@@ -126,7 +127,7 @@ export class RefsService {
       total: parsedTotal,
       users,
       moreUsersCount,
-    } as any;
+    };
   }
 
   public async collectRefsProfit(authUser: UserEntity): Promise<WalletEntity> {

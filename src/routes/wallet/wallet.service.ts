@@ -4,13 +4,6 @@ import { UserEntity } from '../../entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
 import * as moment from 'moment';
-import * as numeral from 'numeral';
-import {
-  boostLevelValues,
-  periodWithSeconds,
-  tonByNonoton,
-  unsubscribedClaimCount,
-} from '../../core/constants/boost-level-values';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
 import { BoostEntity } from '../../entites/boost.entity';
 import { TelegramService } from '../../shared/services/telegram.service';
@@ -19,7 +12,9 @@ import { GetCurrencyRateDtoResponse } from '../../core/models/dto/response/get-c
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { RefEntity } from '../../entites/ref.entity';
-import BigDecimal from "js-big-decimal";
+import BigDecimal from 'js-big-decimal';
+import { BoostDetailsService } from '../../shared/services/boost-details.service';
+import { ConfigService } from '@nestjs/config';
 
 @Injectable()
 export class WalletService {
@@ -36,6 +31,8 @@ export class WalletService {
     private refEntityRepository: Repository<RefEntity>,
     private telegramService: TelegramService,
     private httpService: HttpService,
+    private boostDetailsService: BoostDetailsService,
+    private configService: ConfigService,
   ) {}
 
   public async getMyWallet(authUser: UserEntity): Promise<WalletEntity> {
@@ -59,7 +56,9 @@ export class WalletService {
         },
       },
     });
-
+    const unsubscribedClaimCount = this.configService.get<number>(
+      'UNSUBSCRIBED_CLIM_COUNT',
+    );
     if (wallet.claimCount >= unsubscribedClaimCount) {
       const isSubscribed =
         await this.telegramService.isUserSubscribedToCommunityChannel(
@@ -97,7 +96,7 @@ export class WalletService {
     }
 
     let amount = 0;
-    let seconds = periodWithSeconds;
+    let seconds = this.configService.get<number>('PERIOD_WITH_SECONDS');
     const walletLastClaimedDate = moment(wallet.lastClaimDateTime);
     const boost = await this.boostEntityRepository.findOne({
       where: {
@@ -108,21 +107,21 @@ export class WalletService {
     });
     if (boost) {
       const boostLevel = boost.boostLevel;
-      const boostValues = boostLevelValues[boostLevel];
+      const boostValues = this.boostDetailsService.getDetail(boostLevel);
       const boostExpirationMoment = moment(boost.boostExpirationDate);
       if (boostExpirationMoment.isBefore(now)) {
         const boostSeconds = boostExpirationMoment.diff(
           walletLastClaimedDate,
           'seconds',
         );
-        amount = boostValues.amountPerSecond * boostSeconds;
+        amount = boostValues.perSecondNonotonRevenue * boostSeconds;
         seconds -= boostSeconds;
       } else {
-        amount = boostValues.amountPerSecond * seconds;
+        amount = boostValues.perSecondNonotonRevenue * seconds;
       }
     } else {
-      const boostValues = boostLevelValues[BoostLevels.USUAL];
-      amount = boostValues.amountPerSecond * seconds;
+      const boostValues = this.boostDetailsService.getDetail(BoostLevels.USUAL);
+      amount = boostValues.perSecondNonotonRevenue * seconds;
     }
 
     const referrer = await this.refEntityRepository.findOne({
@@ -148,7 +147,8 @@ export class WalletService {
         if (referrer.referrer?.boost) {
           boostLevel = referrer.referrer.boost.boostLevel;
         }
-        const percent = boostLevelValues[boostLevel].refCashback;
+        const percent =
+          this.boostDetailsService.getDetail(boostLevel).refCashback;
         referrer.nonClaimedRevenue += (amount * percent) / 100;
         await this.refEntityRepository.save(referrer);
       }
@@ -156,9 +156,10 @@ export class WalletService {
 
     wallet.claimCount++;
     wallet.lastClaimDateTime = now.toDate();
+    const tonByNonoton = this.configService.get<number>('TON_BY_NONOTON');
     const tonValue = amount / tonByNonoton + wallet.tons;
     wallet.tons = parseFloat(
-      new BigDecimal(tonValue).round(6).stripTrailingZero().getValue()
+      new BigDecimal(tonValue).round(6).stripTrailingZero().getValue(),
     );
     return this.walletEntityRepository.save(wallet);
   }

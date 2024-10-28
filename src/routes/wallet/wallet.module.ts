@@ -9,7 +9,8 @@ import { BoostEntity } from '../../entites/boost.entity';
 import { GlobalServiceModule } from '../../shared/global-service.module';
 import { HttpModule } from '@nestjs/axios';
 import { RefEntity } from '../../entites/ref.entity';
-import { RefsService } from "../refs/refs.service";
+import { RefsService } from '../refs/refs.service';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   controllers: [WalletController],
@@ -17,6 +18,7 @@ import { RefsService } from "../refs/refs.service";
   imports: [
     GlobalServiceModule,
     HttpModule,
+    ConfigModule,
     TypeOrmModule.forFeature([
       WalletEntity,
       UserEntity,

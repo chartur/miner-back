@@ -1,6 +1,6 @@
 export enum BoostLevels {
-  USUAL = 1,
-  MINI = 2,
-  MAJOR = 3,
-  MEGA = 4,
+  USUAL = 'usual',
+  MINI = 'mini',
+  MAJOR = 'major',
+  MEGA = 'mega',
 }

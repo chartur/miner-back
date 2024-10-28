@@ -1,6 +1,9 @@
 import { Module } from '@nestjs/common';
 import { ENTITIES } from './entites';
-import { ConfigModule } from '@nestjs/config';
+import {
+  ConfigModule as GlobalConfigModule,
+  ConfigService as GlobalConfigService,
+} from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
 import { AppService } from './app.service';
@@ -11,22 +14,32 @@ import { RefsModule } from './routes/refs/refs.module';
 import { WalletModule } from './routes/wallet/wallet.module';
 import { BoostModule } from './routes/boost/boost.module';
 import { GlobalServiceModule } from './shared/global-service.module';
+import { ConfigModule } from './routes/config/config.module';
 
 @Module({
   imports: [
-    ConfigModule.forRoot({
+    GlobalConfigModule.forRoot({
       envFilePath: `.${process.env.mode || 'local'}.env`,
     }),
-    TypeOrmModule.forRoot({
-      type: 'postgres',
-      host: process.env.DB_HOST,
-      port: Number(process.env.DB_PORT),
-      username: process.env.DB_USER,
-      password: process.env.DB_PASSWORD,
-      database: process.env.DB_NAME,
-      synchronize: true,
-      autoLoadEntities: true,
-      entities: ENTITIES,
+    TypeOrmModule.forRootAsync({
+      imports: [GlobalConfigModule],
+      useFactory: (config: GlobalConfigService) => {
+        console.log(config.get<boolean>('DB_SYNC'));
+        return {
+          type: 'postgres',
+          host: config.get<string>('DB_HOST'),
+          port: config.get<number>('DB_PORT'),
+          username: config.get<string>('DB_USER'),
+          password: config.get<string>('DB_PASSWORD'),
+          database: config.get<string>('DB_NAME'),
+          migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
+          migrationsRun: true,
+          synchronize: false,
+          autoLoadEntities: true,
+          entities: ENTITIES,
+        };
+      },
+      inject: [GlobalConfigService],
       // logging: true,
     }),
     JwtModule.register({
@@ -39,6 +52,7 @@ import { GlobalServiceModule } from './shared/global-service.module';
     RefsModule,
     WalletModule,
     BoostModule,
+    ConfigModule,
   ],
   providers: [AppService, JwtService, ParseUserGuard],
   controllers: [AppController],

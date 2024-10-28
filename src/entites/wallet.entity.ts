@@ -53,7 +53,7 @@ export class WalletEntity {
   @Column({
     nullable: true,
     type: 'timestamp with time zone',
-    default: 'NOW()',
+    default: () => 'CURRENT_TIMESTAMP',
   })
   lastRefsClaimDateTime: Date;
 

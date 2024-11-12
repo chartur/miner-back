@@ -35,8 +35,8 @@ import { CronesModule } from './core/crones/crons.module';
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_NAME'),
           migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
-          // migrationsRun: true,
-          synchronize: true,
+          migrationsRun: true,
+          synchronize: false,
           autoLoadEntities: true,
           entities: ENTITIES,
         };

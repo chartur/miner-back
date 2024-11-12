@@ -35,7 +35,7 @@ jobs:
       - name: Package the build into an artifact
         run: |
           mkdir -p artifacts
-          cp -t /build package.json package-lock.json
+          cp -r package.json package-lock.json build/
           zip -r artifacts/artifact.zip build/
 
       - name: Upload artifact

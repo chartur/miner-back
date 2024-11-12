@@ -34,4 +34,10 @@ jobs:
       # Step 4: Package the application into an artifact (tarball)
       - name: Package the build into an artifact
         run: |
-          zip -r artifact.zip build/ .dev.env  # Add other files if needed
+          zip -r artifacts/artifact.zip build/ .dev.env  # Add other files if needed
+
+      - name: Upload artifact
+        uses: actions/upload-artifact@v3
+        with:
+          name: artifacts
+          path: artifacts/

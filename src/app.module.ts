@@ -26,7 +26,6 @@ import { CronesModule } from './core/crones/crons.module';
     TypeOrmModule.forRootAsync({
       imports: [GlobalConfigModule],
       useFactory: (config: GlobalConfigService) => {
-        console.log(config.get<boolean>('DB_SYNC'));
         return {
           type: 'postgres',
           host: config.get<string>('DB_HOST'),
@@ -34,7 +33,7 @@ import { CronesModule } from './core/crones/crons.module';
           username: config.get<string>('DB_USER'),
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_NAME'),
-          migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
+          migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
           migrationsRun: true,
           synchronize: false,
           autoLoadEntities: true,

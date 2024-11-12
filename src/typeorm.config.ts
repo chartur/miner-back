@@ -1,8 +1,8 @@
 import { DataSource } from 'typeorm';
-import { ENTITIES } from './src/entites';
+import { ENTITIES } from './entites';
 import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
-import { DataSourceOptions } from "typeorm/data-source/DataSourceOptions";
+import { DataSourceOptions } from 'typeorm/data-source/DataSourceOptions';
 
 config({
   path: `.${process.env.mode || 'local'}.env`,

@@ -29,13 +29,12 @@ jobs:
       # Step 3: Build the NestJS application
       - name: Build the application
         run: |
-          npm run build
+          npm run build:dev
 
       # Step 4: Package the application into an artifact (tarball)
       - name: Package the build into an artifact
         run: |
           mkdir -p artifacts
-          cp .dev.env build/.dev.env
           zip -r artifacts/artifact.zip build/
 
       - name: Upload artifact

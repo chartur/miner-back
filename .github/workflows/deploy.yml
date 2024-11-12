@@ -14,7 +14,7 @@ jobs:
     steps:
       # Step 1: Checkout the repository code
       - name: Checkout code
-        uses: actions/checkout@v3
+        uses: actions/checkout@v4
 
       # Step 2: Set up Node.js and install dependencies
       - name: Set up Node.js
@@ -35,6 +35,7 @@ jobs:
       - name: Package the build into an artifact
         run: |
           mkdir -p artifacts
+          cp -t /build package.json package-lock.json
           zip -r artifacts/artifact.zip build/
 
       - name: Upload artifact

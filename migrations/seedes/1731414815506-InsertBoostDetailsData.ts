@@ -2,8 +2,8 @@ import { MigrationInterface, QueryRunner } from 'typeorm';
 import { BoostLevels } from '../../src/core/models/enums/boost-levels';
 import { BoostDetails } from '../../src/entites/boost-details';
 
-export class InsertBoostDetailsData1731405288027 implements MigrationInterface {
-  name = 'InsertBoostDetailsData1731405288027';
+export class InsertBoostDetailsData1731414815506 implements MigrationInterface {
+  name = 'InsertBoostDetailsData1731414815506';
 
   private boostLevelValues = {
     [BoostLevels.USUAL]: {

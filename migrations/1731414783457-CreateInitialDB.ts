@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateInitialDB1731405271760 implements MigrationInterface {
-  name = 'CreateInitialDB1731405271760';
+export class CreateInitialDB1731414783457 implements MigrationInterface {
+  name = 'CreateInitialDB1731414783457';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -14,7 +14,7 @@ export class CreateInitialDB1731405271760 implements MigrationInterface {
       `CREATE TYPE "public"."boosts_boostlevel_enum" AS ENUM('usual', 'mini', 'major', 'mega')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "boosts" ("id" BIGSERIAL NOT NULL, "boostLevel" "public"."boosts_boostlevel_enum" NOT NULL DEFAULT 'usual', "boostActivationDate" TIMESTAMP WITH TIME ZONE, "boostExpirationDate" TIMESTAMP WITH TIME ZONE, "refPercent" double precision NOT NULL, "amountPerClaim" double precision NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "userId" bigint, CONSTRAINT "REL_f7460e6f5e6df9ad8b4f1266e0" UNIQUE ("userId"), CONSTRAINT "PK_225335d93bbce36b48152a26b48" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "boosts" ("id" BIGSERIAL NOT NULL, "boostLevel" "public"."boosts_boostlevel_enum" NOT NULL DEFAULT 'usual', "boostActivationDate" TIMESTAMP WITH TIME ZONE, "boostExpirationDate" TIMESTAMP WITH TIME ZONE, "refPercent" double precision NOT NULL, "amountPerClaim" double precision NOT NULL, "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "userId" bigint, CONSTRAINT "PK_225335d93bbce36b48152a26b48" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TYPE "public"."transactions_action_enum" AS ENUM('1', '2', '3')`,

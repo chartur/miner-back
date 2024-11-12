@@ -2,8 +2,8 @@ import { HttpException, HttpStatus, Injectable, Logger } from '@nestjs/common';
 import { WalletEntity } from '../../entites/wallet.entity';
 import { UserEntity } from '../../entites/user.entity';
 import { InjectRepository } from '@nestjs/typeorm';
-import { Repository } from 'typeorm';
-import * as moment from 'moment';
+import { DataSource, Repository } from 'typeorm';
+import moment from 'moment';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
 import { BoostEntity } from '../../entites/boost.entity';
 import { TelegramService } from '../../shared/services/telegram.service';
@@ -29,6 +29,7 @@ export class WalletService {
     private userEntityRepository: Repository<UserEntity>,
     @InjectRepository(RefEntity)
     private refEntityRepository: Repository<RefEntity>,
+    private dataSource: DataSource,
     private telegramService: TelegramService,
     private httpService: HttpService,
     private boostDetailsService: BoostDetailsService,
@@ -95,13 +96,31 @@ export class WalletService {
       );
     }
 
+    return this.claimFunc(authUser, wallet, now);
+  }
+
+  public getRates(): Promise<GetCurrencyRateDtoResponse | { error: string }> {
+    return firstValueFrom(
+      this.httpService.get<GetCurrencyRateDtoResponse>(
+        process.env.GET_CURRENCY_RATE_LINK,
+      ),
+    ).then((res) => res.data);
+  }
+
+  public async claimFunc(
+    user: UserEntity,
+    wallet: WalletEntity,
+    now: moment.Moment,
+  ): Promise<WalletEntity> {
     let amount = 0;
-    let seconds = this.configService.get<number>('PERIOD_WITH_SECONDS');
+    let seconds = parseInt(
+      this.configService.get<string>('PERIOD_WITH_SECONDS'),
+    );
     const walletLastClaimedDate = moment(wallet.lastClaimDateTime);
     const boost = await this.boostEntityRepository.findOne({
       where: {
         user: {
-          id: authUser.id,
+          id: user.id,
         },
       },
     });
@@ -127,48 +146,57 @@ export class WalletService {
     const referrer = await this.refEntityRepository.findOne({
       where: {
         referral: {
-          id: authUser.id,
+          id: user.id,
         },
       },
       relations: {
         referrer: {
-          boost: true,
+          boosts: true,
           wallet: true,
         },
       },
     });
 
-    if (referrer) {
-      const lastRefClaimDateTime = moment(
-        referrer.referrer.wallet.lastRefsClaimDateTime,
-      );
-      if (lastRefClaimDateTime.add(1, 'weeks').isAfter(now)) {
-        let boostLevel = BoostLevels.USUAL;
-        if (referrer.referrer?.boost) {
-          boostLevel = referrer.referrer.boost.boostLevel;
+    const queryRunner = this.dataSource.createQueryRunner();
+    await queryRunner.startTransaction();
+
+    try {
+      if (referrer) {
+        const lastRefClaimDateTime = moment(
+          referrer.referrer.wallet.lastRefsClaimDateTime,
+        );
+        if (lastRefClaimDateTime.add(1, 'weeks').isAfter(now)) {
+          let boostLevel = BoostLevels.USUAL;
+          if (referrer.referrer?.boost) {
+            boostLevel = referrer.referrer.boost.boostLevel;
+          }
+          const percent =
+            this.boostDetailsService.getDetail(boostLevel).refCashback;
+          referrer.nonClaimedRevenue += (amount * percent) / 100;
+          await this.refEntityRepository.save(referrer);
         }
-        const percent =
-          this.boostDetailsService.getDetail(boostLevel).refCashback;
-        referrer.nonClaimedRevenue += (amount * percent) / 100;
-        await this.refEntityRepository.save(referrer);
       }
+
+      wallet.claimCount++;
+      wallet.lastClaimDateTime = now.toDate();
+      const tonByNonoton = parseInt(
+        this.configService.get<string>('TON_BY_NONOTON'),
+      );
+      const tonValue = amount / tonByNonoton + wallet.tons;
+      wallet.tons = parseFloat(
+        new BigDecimal(tonValue).round(6).stripTrailingZero().getValue(),
+      );
+      if (boost && moment(boost.boostExpirationDate).isBefore(now)) {
+        await this.boostEntityRepository.remove(boost);
+      }
+      return this.walletEntityRepository.save(wallet);
+    } catch (error) {
+      this.logger.log('[WalletService] Failure: ClaimFunc error', {
+        error,
+      });
+      await queryRunner.rollbackTransaction();
+    } finally {
+      await queryRunner.release();
     }
-
-    wallet.claimCount++;
-    wallet.lastClaimDateTime = now.toDate();
-    const tonByNonoton = this.configService.get<number>('TON_BY_NONOTON');
-    const tonValue = amount / tonByNonoton + wallet.tons;
-    wallet.tons = parseFloat(
-      new BigDecimal(tonValue).round(6).stripTrailingZero().getValue(),
-    );
-    return this.walletEntityRepository.save(wallet);
-  }
-
-  public getRates(): Promise<GetCurrencyRateDtoResponse | { error: string }> {
-    return firstValueFrom(
-      this.httpService.get<GetCurrencyRateDtoResponse>(
-        process.env.GET_CURRENCY_RATE_LINK,
-      ),
-    ).then((res) => res.data);
   }
 }

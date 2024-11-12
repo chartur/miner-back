@@ -1,15 +1,17 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
-  OneToOne,
+  ManyToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { BoostLevels } from '../core/models/enums/boost-levels';
 import { UserEntity } from './user.entity';
+import {
+  CreateDateWithTimezone,
+  UpdateDateWithTimezone,
+} from '../core/decorators/action-date-columns';
 
 @Entity('boosts')
 export class BoostEntity {
@@ -21,9 +23,8 @@ export class BoostEntity {
     example: UserEntity,
     description: 'The owner user of the boost',
   })
-  @JoinColumn()
-  @OneToOne(() => UserEntity, (user) => user.boost, { lazy: true })
-  user: Promise<UserEntity>;
+  @ManyToOne(() => UserEntity, (user) => user.boosts)
+  user: UserEntity;
 
   @ApiProperty({
     example: BoostLevels.MINI,
@@ -64,13 +65,13 @@ export class BoostEntity {
     example: '2011-10-05T14:48:00.000Z',
     description: 'Creation date',
   })
-  @CreateDateColumn()
+  @CreateDateWithTimezone()
   createdAt: Date;
 
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',
     description: 'Last edit date of user',
   })
-  @UpdateDateColumn()
+  @UpdateDateWithTimezone()
   updatedAt: Date;
 }

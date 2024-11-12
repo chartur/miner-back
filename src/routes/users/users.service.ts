@@ -45,8 +45,9 @@ export class UsersService {
       where: {
         tUserId: user.id.toString(),
       },
-      relations: ['wallet', 'boost'],
+      relations: ['wallet', 'boosts'],
     });
+    console.log(existingUserData);
     const newUserData = {
       tUserId: user.id.toString(),
       photoFileId: profilePhotoFileId,
@@ -107,7 +108,7 @@ export class UsersService {
       where: {
         tUserId,
       },
-      relations: ['wallet', 'boost'],
+      relations: ['wallet', 'boosts'],
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -128,7 +129,7 @@ export class UsersService {
       where: {
         id: authUser.id,
       },
-      relations: ['wallet', 'boost'],
+      relations: ['wallet', 'boosts'],
     });
   }
 

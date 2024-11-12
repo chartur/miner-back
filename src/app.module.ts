@@ -15,6 +15,8 @@ import { WalletModule } from './routes/wallet/wallet.module';
 import { BoostModule } from './routes/boost/boost.module';
 import { GlobalServiceModule } from './shared/global-service.module';
 import { ConfigModule } from './routes/config/config.module';
+import { ScheduleModule } from '@nestjs/schedule';
+import { CronesModule } from './core/crones/crons.module';
 
 @Module({
   imports: [
@@ -33,8 +35,8 @@ import { ConfigModule } from './routes/config/config.module';
           password: config.get<string>('DB_PASSWORD'),
           database: config.get<string>('DB_NAME'),
           migrations: [__dirname + '/../migrations/**/*{.ts,.js}'],
-          migrationsRun: true,
-          synchronize: false,
+          // migrationsRun: true,
+          synchronize: true,
           autoLoadEntities: true,
           entities: ENTITIES,
         };
@@ -42,11 +44,13 @@ import { ConfigModule } from './routes/config/config.module';
       inject: [GlobalConfigService],
       // logging: true,
     }),
+    ScheduleModule.forRoot(),
     JwtModule.register({
       global: true,
       secret: process.env.JWT_SECRET,
       signOptions: { expiresIn: '6h' },
     }),
+    CronesModule,
     GlobalServiceModule,
     UsersModule,
     RefsModule,

@@ -2,6 +2,7 @@ import { DataSource } from 'typeorm';
 import { ENTITIES } from './src/entites';
 import { config } from 'dotenv';
 import { ConfigService } from '@nestjs/config';
+import { DataSourceOptions } from "typeorm/data-source/DataSourceOptions";
 
 config({
   path: `.${process.env.mode || 'local'}.env`,
@@ -19,7 +20,7 @@ const DBConfig = {
   migrations: [__dirname + '/migrations/**/*{.ts,.js}'],
   synchronize: false,
   entities: ENTITIES,
-};
+} as DataSourceOptions;
 
 const dataSource = new DataSource(DBConfig as any);
 dataSource.initialize();

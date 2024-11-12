@@ -1,11 +1,9 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 
 import { Language } from '../core/models/enums/language';
@@ -13,6 +11,13 @@ import { ApiProperty } from '@nestjs/swagger';
 import { RefEntity } from './ref.entity';
 import { WalletEntity } from './wallet.entity';
 import { BoostEntity } from './boost.entity';
+import { TransactionEntity } from './transaction.entity';
+import { InvoiceEntity } from './invoice.entity';
+import {
+  CreateDateWithTimezone,
+  UpdateDateWithTimezone,
+} from '../core/decorators/action-date-columns';
+import { Expose } from 'class-transformer';
 
 @Entity('users')
 export class UserEntity {
@@ -61,11 +66,11 @@ export class UserEntity {
   wallet: WalletEntity;
 
   @ApiProperty({
-    example: BoostEntity,
-    description: 'The boost of current user',
+    example: [BoostEntity],
+    description: 'The boosts list of current user',
   })
-  @OneToOne(() => BoostEntity, (boost) => boost.user, { cascade: true })
-  boost?: BoostEntity;
+  @OneToMany(() => BoostEntity, (boost) => boost.user)
+  boosts: BoostEntity[];
 
   @ApiProperty({
     example: [RefEntity],
@@ -82,16 +87,47 @@ export class UserEntity {
   referrer?: RefEntity;
 
   @ApiProperty({
+    example: [TransactionEntity],
+    description: 'User transactions list',
+  })
+  @OneToMany(() => TransactionEntity, (type) => type.user)
+  transactions: TransactionEntity[];
+
+  @ApiProperty({
+    example: [InvoiceEntity],
+    description: 'User created invoices',
+  })
+  @OneToMany(() => InvoiceEntity, (type) => type.user)
+  invoices: InvoiceEntity[];
+
+  @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',
     description: 'Creation date',
   })
-  @CreateDateColumn()
+  @CreateDateWithTimezone()
   createdAt: Date;
 
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',
     description: 'Last edit date of user',
   })
-  @UpdateDateColumn()
+  @UpdateDateWithTimezone()
   updatedAt: Date;
+
+  @ApiProperty({
+    example: BoostEntity,
+    description: 'The boost of current user',
+  })
+  @Expose()
+  public get boost(): BoostEntity | null {
+    return this.boosts?.[0] || null;
+  }
+
+  public get lastBoost(): BoostEntity | null {
+    return this.boosts.length ? this.boosts[this.boosts.length - 1] : null;
+  }
+
+  public set boost(boost: BoostEntity) {
+    this.boosts.push(boost);
+  }
 }

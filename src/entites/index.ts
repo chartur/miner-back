@@ -3,6 +3,9 @@ import { RefEntity } from './ref.entity';
 import { WalletEntity } from './wallet.entity';
 import { BoostEntity } from './boost.entity';
 import { BoostDetails } from './boost-details';
+import { TransactionEntity } from './transaction.entity';
+import { InvoiceEntity } from './invoice.entity';
+import { SettingsEntity } from './settings.entity';
 
 export const ENTITIES = [
   UserEntity,
@@ -10,4 +13,7 @@ export const ENTITIES = [
   WalletEntity,
   BoostEntity,
   BoostDetails,
+  TransactionEntity,
+  InvoiceEntity,
+  SettingsEntity,
 ];

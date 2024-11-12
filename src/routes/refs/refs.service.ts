@@ -4,7 +4,7 @@ import { UserEntity } from '../../entites/user.entity';
 import { DataSource, Repository } from 'typeorm';
 import { RefEntity } from '../../entites/ref.entity';
 import { RefsProfitDto } from '../../core/models/dto/response/refs-profit.dto';
-import * as moment from 'moment';
+import moment from 'moment';
 import { WalletEntity } from '../../entites/wallet.entity';
 import BigDecimal from 'js-big-decimal';
 import { MyRefsDto } from '../../core/models/dto/response/my-refs.dto';

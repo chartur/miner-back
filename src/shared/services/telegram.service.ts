@@ -5,6 +5,7 @@ import { Telegraf } from 'telegraf';
 import { TelegramChannelUserValidTypes } from '../../core/models/enums/telegram-channel-user-valid-types';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
+import { TelegramSendMessage } from '../../core/models/interfaces/telegram-send-message';
 
 @Injectable({
   scope: Scope.DEFAULT,
@@ -54,11 +55,15 @@ export class TelegramService {
     this._bot.launch();
   }
 
+  public getAppUrl(): URL {
+    return new URL(this._telegramAction.appUrl);
+  }
+
   public async *getUserProfilePhoto(
     telegramUserId: number,
   ): AsyncGenerator<string | null, string | null, void> {
     const photo = await this._bot.telegram
-      .getUserProfilePhotos(telegramUserId, 0, 1)
+      .getUserProfilePhotos(Number(telegramUserId), 0, 1)
       .then((res) => (res.total_count > 0 ? res.photos[0][0] : undefined));
 
     yield photo?.file_id || null;
@@ -89,5 +94,25 @@ export class TelegramService {
           res.status as TelegramChannelUserValidTypes,
         ),
       );
+  }
+
+  public sendMessage(data: TelegramSendMessage): Promise<void> {
+    if (data.photoUrl) {
+      return this._bot.telegram
+        .sendPhoto(
+          data.chatId,
+          { url: data.photoUrl },
+          {
+            caption: data.text,
+            ...data.buttons,
+          },
+        )
+        .then();
+    }
+    return this._bot.telegram
+      .sendMessage(data.chatId, data.text, {
+        ...data.buttons,
+      })
+      .then();
   }
 }

@@ -1,14 +1,16 @@
 import {
   Column,
-  CreateDateColumn,
   Entity,
   JoinColumn,
   OneToOne,
   PrimaryGeneratedColumn,
-  UpdateDateColumn,
 } from 'typeorm';
 import { ApiProperty } from '@nestjs/swagger';
 import { UserEntity } from './user.entity';
+import {
+  CreateDateWithTimezone,
+  UpdateDateWithTimezone,
+} from '../core/decorators/action-date-columns';
 
 @Entity('wallets')
 export class WalletEntity {
@@ -61,13 +63,13 @@ export class WalletEntity {
     example: '2011-10-05T14:48:00.000Z',
     description: 'Creation date',
   })
-  @CreateDateColumn()
+  @CreateDateWithTimezone()
   createdAt: Date;
 
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',
     description: 'Last edit date of user',
   })
-  @UpdateDateColumn()
+  @UpdateDateWithTimezone()
   updatedAt: Date;
 }

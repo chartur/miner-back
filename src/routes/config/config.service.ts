@@ -17,9 +17,11 @@ export class ConfigService {
 
     return {
       boostDetails: this.boostDetailsService.details,
-      tonByNonoton: this.globalConfigService.get<number>('TON_BY_NONOTON'),
-      periodWithSeconds: this.globalConfigService.get<number>(
-        'PERIOD_WITH_SECONDS',
+      tonByNonoton: Number(
+        this.globalConfigService.get<number>('TON_BY_NONOTON'),
+      ),
+      periodWithSeconds: Number(
+        this.globalConfigService.get<string>('PERIOD_WITH_SECONDS'),
       ),
     };
   }

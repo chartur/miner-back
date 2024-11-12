@@ -1,9 +1,9 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
-import { BoostDetails } from '../src/entites/boost-details';
-import { BoostLevels } from '../src/core/models/enums/boost-levels';
+import { BoostLevels } from '../../src/core/models/enums/boost-levels';
+import { BoostDetails } from '../../src/entites/boost-details';
 
-export class InsertBoostDetailsData1730152595926 implements MigrationInterface {
-  name = 'InsertBoostDetailsData1730152595926';
+export class InsertBoostDetailsData1731405288027 implements MigrationInterface {
+  name = 'InsertBoostDetailsData1731405288027';
 
   private boostLevelValues = {
     [BoostLevels.USUAL]: {
@@ -47,11 +47,10 @@ export class InsertBoostDetailsData1730152595926 implements MigrationInterface {
       processorCount: 4,
     },
   };
-
   public async up(queryRunner: QueryRunner): Promise<void> {
     const repo = queryRunner.manager.getRepository(BoostDetails);
     const entities: BoostDetails[] = repo.create(
-      Object.values(this.boostLevelValues),
+      Object.values(this.boostLevelValues) as BoostDetails[],
     );
     await repo.save(entities);
   }

@@ -3,10 +3,18 @@ import { BoostController } from './boost.controller';
 import { BoostService } from './boost.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { BoostEntity } from '../../entites/boost.entity';
+import { UserEntity } from '../../entites/user.entity';
+import { GlobalServiceModule } from '../../shared/global-service.module';
+import { InvoiceEntity } from '../../entites/invoice.entity';
+import { ConfigModule } from '@nestjs/config';
 
 @Module({
   controllers: [BoostController],
   providers: [BoostService],
-  imports: [TypeOrmModule.forFeature([BoostEntity])],
+  imports: [
+    GlobalServiceModule,
+    ConfigModule,
+    TypeOrmModule.forFeature([BoostEntity, UserEntity, InvoiceEntity]),
+  ],
 })
 export class BoostModule {}

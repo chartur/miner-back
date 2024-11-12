@@ -17,7 +17,7 @@ export const telegramDataValidator = (data: DynamicSyncData): boolean => {
 
   const secret_key = crypto
     .createHmac('sha256', 'WebAppData')
-    .update(process.env.telegramKey)
+    .update(process.env.TELEGRAM_BOT_KEY)
     .digest();
   const calculated_hash = crypto
     .createHmac('sha256', secret_key)

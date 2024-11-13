@@ -35,7 +35,7 @@ jobs:
       - name: Package the build into an artifact
         run: |
           mkdir -p artifacts
-          cp -r package.json package-lock.json .dev.env build/
+          cp .dev.env package.json package-lock.json build/
 
       - name: Upload artifact
         uses: actions/upload-artifact@v4

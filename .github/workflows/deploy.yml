@@ -3,13 +3,13 @@ name: Build and Deploy NestJS
 on:
   push:
     branches:
-      - develop  # or any other branch you want to trigger the deployment on
+      - develop
 env:
   mode: dev
 
 jobs:
   build_and_deploy:
-    runs-on: ubuntu-latest  # Using Ubuntu runner for the CI
+    runs-on: ubuntu-latest
 
     steps:
       # Step 1: Checkout the repository code
@@ -20,7 +20,7 @@ jobs:
       - name: Set up Node.js
         uses: actions/setup-node@v3
         with:
-          node-version: '20'  # Specify your Node.js version
+          node-version: '20'
 
       - name: Install dependencies
         run: |
@@ -31,10 +31,16 @@ jobs:
         run: |
           npm run build
 
-      # Step 4: Package the application into an artifact (tarball)
+      # Step 4: Check if .dev.env exists
+      - name: Check if .dev.env exists
+        run: |
+          ls -al .dev.env
+
+      # Step 5: Package the build into an artifact
       - name: Package the build into an artifact
         run: |
           mkdir -p artifacts
+          ls -al .  # List files in the working directory
           cp .dev.env package.json package-lock.json build/
 
       - name: Upload artifact

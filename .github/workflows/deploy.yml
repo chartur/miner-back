@@ -48,3 +48,5 @@ jobs:
         with:
           name: artifacts
           path: build/
+          include-hidden-files: true
+          overwrite: true

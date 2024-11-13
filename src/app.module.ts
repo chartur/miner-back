@@ -6,7 +6,6 @@ import {
 } from '@nestjs/config';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { AppController } from './app.controller';
-import { AppService } from './app.service';
 import { UsersModule } from './routes/users/users.module';
 import { JwtModule, JwtService } from '@nestjs/jwt';
 import { ParseUserGuard } from './shared/guards/parse-user.guard';
@@ -57,7 +56,7 @@ import { CronesModule } from './core/crones/crons.module';
     BoostModule,
     ConfigModule,
   ],
-  providers: [AppService, JwtService, ParseUserGuard],
+  providers: [JwtService, ParseUserGuard],
   controllers: [AppController],
 })
 export class AppModule {}

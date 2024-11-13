@@ -34,10 +34,8 @@ export class TransactionEntity {
     example: UserEntity,
     description: 'The owner user of the boost',
   })
-  @ManyToOne(() => UserEntity, (user) => user.transactions, {
-    lazy: true,
-  })
-  user: Promise<UserEntity>;
+  @ManyToOne(() => UserEntity, (user) => user.transactions)
+  user: UserEntity;
 
   @ApiProperty({
     example: 'adsfadsfxzcvfhsdgasdf',

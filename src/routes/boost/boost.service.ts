@@ -94,7 +94,6 @@ export class BoostService {
     if (!boostDetails) {
       throw new BadRequestException('Boost not found');
     }
-    console.log(authUser.boost);
     const expirationDate = now.clone().add(10, 'days');
     const boostDto = this.boostEntityRepository.create({
       boostLevel: boostType,

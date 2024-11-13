@@ -45,13 +45,6 @@ export class UserEntity {
   photoUrl?: string;
 
   @ApiProperty({
-    example: '123124245982190384092',
-    description: 'Telegram photo file id',
-  })
-  @Column({ nullable: true, type: 'text' })
-  photoFileId?: string;
-
-  @ApiProperty({
     example: Language.EN,
     description: 'Telegram based language code of user',
   })
@@ -62,21 +55,23 @@ export class UserEntity {
     example: WalletEntity,
     description: 'The wallet of current user',
   })
-  @OneToOne(() => WalletEntity, (wallet) => wallet.user, { cascade: true })
+  @OneToOne(() => WalletEntity, (wallet) => wallet.user, {
+    onDelete: 'CASCADE',
+  })
   wallet: WalletEntity;
 
   @ApiProperty({
     example: [BoostEntity],
     description: 'The boosts list of current user',
   })
-  @OneToMany(() => BoostEntity, (boost) => boost.user)
+  @OneToMany(() => BoostEntity, (boost) => boost.user, { onDelete: 'CASCADE' })
   boosts: BoostEntity[];
 
   @ApiProperty({
     example: [RefEntity],
     description: 'Users list which current user invited',
   })
-  @OneToMany(() => RefEntity, (ref) => ref.referrer)
+  @OneToMany(() => RefEntity, (ref) => ref.referrer, { onDelete: 'CASCADE' })
   referrals: RefEntity[];
 
   @ApiProperty({
@@ -97,7 +92,7 @@ export class UserEntity {
     example: [InvoiceEntity],
     description: 'User created invoices',
   })
-  @OneToMany(() => InvoiceEntity, (type) => type.user)
+  @OneToMany(() => InvoiceEntity, (type) => type.user, { onDelete: 'CASCADE' })
   invoices: InvoiceEntity[];
 
   @ApiProperty({

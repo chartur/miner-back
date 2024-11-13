@@ -8,7 +8,7 @@ import { InvoiceEntity } from '../../entites/invoice.entity';
 import { beginCell, toNano } from 'ton';
 import { UserEntity } from '../../entites/user.entity';
 import { AppTonClient } from './app-ton-client.service';
-import { InvoiceAction } from "../../core/models/enums/invoice-action";
+import { InvoiceAction } from '../../core/models/enums/invoice-action';
 
 @Injectable()
 export class TransactionsService {
@@ -32,7 +32,7 @@ export class TransactionsService {
       action,
       details,
     });
-    invoiceData.user = Promise.resolve({ id: userId } as UserEntity);
+    invoiceData.user = { id: userId } as UserEntity;
     const invoice = await this.invoiceEntityRepository.save(invoiceData);
     await this.invoiceEntityRepository.save(invoiceData);
     const payload = this.prepareTransactionPayload(invoice.id);

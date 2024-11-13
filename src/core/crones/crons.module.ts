@@ -16,6 +16,7 @@ import { TransactionsCron } from './transactions.cron';
 
 @Module({
   providers: [TransactionsCron, WalletService, ConfigService, BoostService],
+  // providers: [WalletService, ConfigService, BoostService],
   imports: [
     GlobalServiceModule,
     HttpModule,

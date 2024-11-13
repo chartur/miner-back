@@ -14,7 +14,7 @@ import { Markup } from 'telegraf';
 
 export class ParsedTransaction {
   private _invoiceId?: string;
-  private _user?: Promise<UserEntity>;
+  private _user?: UserEntity;
   private _action?: InvoiceAction;
   private _invoice?: InvoiceEntity;
 
@@ -51,7 +51,7 @@ export class ParsedTransaction {
     return this._invoiceId;
   }
 
-  public get user(): Promise<UserEntity> | undefined {
+  public get user(): UserEntity | undefined {
     return this._user;
   }
 
@@ -62,17 +62,15 @@ export class ParsedTransaction {
   }
 
   public async claim(now: Moment): Promise<WalletEntity> {
-    const user = await this._invoice.user;
-    return this.walletService.claimFunc(user, user.wallet, now);
+    return this.walletService.claimFunc(this.user, this.user.wallet, now);
   }
 
   public async activate(now: Moment): Promise<void> {
-    const user = await this._invoice.user;
-    if (user.lastBoost) {
-      now = moment(user.lastBoost.boostExpirationDate);
+    if (this.user.lastBoost) {
+      now = moment(this.user.lastBoost.boostExpirationDate);
     }
     return this.boostService
-      .activate(user, this._invoice.action, now)
+      .activate(this.user, this._invoice.action, now)
       .then(() => {
         return this.sendSuccessActivationMessage();
       });
@@ -106,6 +104,7 @@ export class ParsedTransaction {
       fromAddress: this.tx.inMessage.info.src.toString(),
       payload: this.invoiceId,
       paidAt: moment((this.tx.inMessage.info as any).createdAt * 1000).toDate(),
+      user: this.user,
     };
   }
 

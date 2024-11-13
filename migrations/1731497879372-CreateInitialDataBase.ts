@@ -1,7 +1,7 @@
 import { MigrationInterface, QueryRunner } from 'typeorm';
 
-export class CreateInitialDB1731414783457 implements MigrationInterface {
-  name = 'CreateInitialDB1731414783457';
+export class CreateInitialDataBase1731497879372 implements MigrationInterface {
+  name = 'CreateInitialDataBase1731497879372';
 
   public async up(queryRunner: QueryRunner): Promise<void> {
     await queryRunner.query(
@@ -32,7 +32,7 @@ export class CreateInitialDB1731414783457 implements MigrationInterface {
       `CREATE TYPE "public"."users_languagecode_enum" AS ENUM('ru', 'en')`,
     );
     await queryRunner.query(
-      `CREATE TABLE "users" ("id" BIGSERIAL NOT NULL, "tUserId" bigint NOT NULL, "firstName" character varying NOT NULL, "lastName" character varying NOT NULL, "photoUrl" text, "photoFileId" text, "languageCode" "public"."users_languagecode_enum" NOT NULL DEFAULT 'en', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_d77cf35597b176bf85c571dcaf4" UNIQUE ("tUserId"), CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`,
+      `CREATE TABLE "users" ("id" BIGSERIAL NOT NULL, "tUserId" bigint NOT NULL, "firstName" character varying NOT NULL, "lastName" character varying NOT NULL, "photoUrl" text, "languageCode" "public"."users_languagecode_enum" NOT NULL DEFAULT 'en', "createdAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), "updatedAt" TIMESTAMP WITH TIME ZONE NOT NULL DEFAULT now(), CONSTRAINT "UQ_d77cf35597b176bf85c571dcaf4" UNIQUE ("tUserId"), CONSTRAINT "PK_a3ffb1c0c8416b9fc6f907b7433" PRIMARY KEY ("id"))`,
     );
     await queryRunner.query(
       `CREATE TYPE "public"."boost_details_name_enum" AS ENUM('usual', 'mini', 'major', 'mega')`,

@@ -27,9 +27,8 @@ export class InvoiceEntity {
   })
   @ManyToOne(() => UserEntity, (user) => user.invoices, {
     onDelete: 'CASCADE',
-    lazy: true,
   })
-  user: Promise<UserEntity>;
+  user: UserEntity;
 
   @ApiProperty({
     example: '0.003',

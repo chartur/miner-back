@@ -49,4 +49,13 @@ export class TelegramUserDto {
   @IsBoolean()
   @IsOptional()
   allows_write_to_pm: boolean;
+
+  @ApiProperty({
+    example: true,
+    description: 'User telegram photo url',
+    required: false,
+  })
+  @IsString()
+  @IsOptional()
+  photo_url: string;
 }

@@ -35,4 +35,11 @@ export class SyncUserDto {
   @ValidateNested()
   @Type(() => TelegramUserDto)
   user: TelegramUserDto;
+
+  @ApiProperty({
+    example: 'query_id=ad123ads&user={123}',
+    description: 'The initial data string provided by telegram',
+  })
+  @IsString()
+  initData: string;
 }

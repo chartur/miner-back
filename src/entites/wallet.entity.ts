@@ -23,8 +23,8 @@ export class WalletEntity {
     description: 'The owner user of the wallet',
   })
   @JoinColumn()
-  @OneToOne(() => UserEntity, (user) => user.wallet, { lazy: true })
-  user: Promise<UserEntity>;
+  @OneToOne(() => UserEntity, (user) => user.wallet)
+  user: UserEntity;
 
   @ApiProperty({
     example: 3,

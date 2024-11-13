@@ -86,7 +86,7 @@ export class RefsService {
     });
 
     const now = moment();
-    const wallet = await user.wallet;
+    const wallet = user.wallet;
     const lastClaimDate = moment(wallet.lastRefsClaimDateTime);
     if (lastClaimDate.add(1, 'weeks').isAfter(now)) {
       throw new BadRequestException();

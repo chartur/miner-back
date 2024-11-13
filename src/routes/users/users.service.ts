@@ -19,6 +19,8 @@ export class UsersService {
   constructor(
     @InjectRepository(UserEntity)
     private userEntityRepository: Repository<UserEntity>,
+    @InjectRepository(WalletEntity)
+    private walletEntityRepository: Repository<WalletEntity>,
     private telegramService: TelegramService,
     private authService: AuthService,
     private refsService: RefsService,
@@ -29,16 +31,13 @@ export class UsersService {
       body: syncData,
       ref,
     });
-
-    const isValidUser = telegramDataValidator(syncData as DynamicSyncData);
+    const data = syncData as DynamicSyncData;
+    const isValidUser = telegramDataValidator(data.initData, data.hash);
     if (!isValidUser) {
       throw new BadRequestException();
     }
 
     const { user } = syncData;
-    const profilePhotoAsync = this.telegramService.getUserProfilePhoto(user.id);
-    const profilePhotoFileId: string = (await profilePhotoAsync.next())
-      .value as string;
 
     let userEntity: UserEntity;
     const existingUserData = await this.userEntityRepository.findOne({
@@ -47,25 +46,19 @@ export class UsersService {
       },
       relations: ['wallet', 'boosts'],
     });
-    console.log(existingUserData);
     const newUserData = {
       tUserId: user.id.toString(),
-      photoFileId: profilePhotoFileId,
       languageCode: user.language_code as Language,
       firstName: user.first_name,
       lastName: user.last_name,
+      photoUrl: user.photo_url,
     };
-    if (!profilePhotoFileId) {
-      newUserData['photoUrl'] = null;
-    }
 
     if (!existingUserData) {
-      const photoUrl = (await profilePhotoAsync.next()).value as string;
       userEntity = await this.userEntityRepository.save({
         ...newUserData,
-        photoUrl,
-        wallet: new WalletEntity(),
       });
+      await this.walletEntityRepository.save({ user: userEntity });
       if (ref) {
         this.refsService.create(userEntity, ref);
       }
@@ -80,12 +73,10 @@ export class UsersService {
       if (isSame) {
         userEntity = existingUserData;
       } else {
-        const photoUrl = (await profilePhotoAsync.next()).value as string;
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
         userEntity = await this.userEntityRepository.save({
           ...existingUserData,
           ...newUserData,
-          photoUrl,
         });
       }
     }

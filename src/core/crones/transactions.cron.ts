@@ -37,8 +37,8 @@ export class TransactionsCron {
     private telegramService: TelegramService,
   ) {}
 
-  @Cron('*/2 * * * *')
-  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // @Cron('*/2 * * * *')
+  @Cron(CronExpression.EVERY_5_SECONDS)
   async handleCron(): Promise<void> {
     if (TransactionsCron.isJobRunning) {
       this.logger.log(
@@ -199,7 +199,7 @@ export class TransactionsCron {
       transactionsMap.unshift(...filteredTransactions);
 
       if (transactions.length === limit) {
-        await sleep(1200);
+        await sleep(3000);
         return await this.getTransactions({
           limit,
           transactionsMap,
@@ -213,7 +213,6 @@ export class TransactionsCron {
       return transactionsMap;
     } catch (error) {
       if (error instanceof AxiosError && error.status === 500) {
-        console.log(error);
         this.logger.log('[TransactionsCron] recalled to get transactions', {
           dto: {
             ...dto,
@@ -224,7 +223,7 @@ export class TransactionsCron {
             message: error.message,
           },
         });
-        await sleep(1200);
+        await sleep(3000);
         return await this.getTransactions(dto);
       }
       this.logger.error('[TransactionsCron] get transactions failure', {

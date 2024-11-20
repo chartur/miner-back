@@ -8,7 +8,7 @@ import { RefsProfitDto } from '../../core/models/dto/response/refs-profit.dto';
 import { WalletEntity } from '../../entites/wallet.entity';
 import { MyRefsDto } from '../../core/models/dto/response/my-refs.dto';
 
-@ApiTags('refs')
+@ApiTags('Refs')
 @Controller('refs')
 export class RefsController {
   constructor(private refsService: RefsService) {}

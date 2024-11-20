@@ -1,9 +1,11 @@
 import {
   Column,
   Entity,
+  ManyToMany,
   OneToMany,
   OneToOne,
   PrimaryGeneratedColumn,
+  JoinTable,
 } from 'typeorm';
 
 import { Language } from '../core/models/enums/language';
@@ -18,6 +20,7 @@ import {
   UpdateDateWithTimezone,
 } from '../core/decorators/action-date-columns';
 import { Expose } from 'class-transformer';
+import { TaskEntity } from './task.entity';
 
 @Entity('users')
 export class UserEntity {
@@ -94,6 +97,14 @@ export class UserEntity {
   })
   @OneToMany(() => InvoiceEntity, (type) => type.user, { onDelete: 'CASCADE' })
   invoices: InvoiceEntity[];
+
+  @ApiProperty({
+    example: [UserEntity],
+    description: 'Users that completed the current task',
+  })
+  @ManyToMany(() => TaskEntity, (user) => user.completedBy)
+  @JoinTable()
+  completedTasks: TaskEntity[];
 
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',

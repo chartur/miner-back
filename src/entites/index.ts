@@ -6,6 +6,7 @@ import { BoostDetails } from './boost-details';
 import { TransactionEntity } from './transaction.entity';
 import { InvoiceEntity } from './invoice.entity';
 import { SettingsEntity } from './settings.entity';
+import { TaskEntity } from './task.entity';
 
 export const ENTITIES = [
   UserEntity,
@@ -16,4 +17,5 @@ export const ENTITIES = [
   TransactionEntity,
   InvoiceEntity,
   SettingsEntity,
+  TaskEntity,
 ];

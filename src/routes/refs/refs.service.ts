@@ -82,11 +82,17 @@ export class RefsService {
 
   public async getRefsProfit(user: UserEntity): Promise<RefsProfitDto> {
     this.logger.log('[Refs] get my profit', {
-      userId: user.id,
+      user,
     });
 
     const now = moment();
-    const wallet = user.wallet;
+    const wallet = await this.walletEntityRepository.findOneOrFail({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
     const lastClaimDate = moment(wallet.lastRefsClaimDateTime);
     if (lastClaimDate.add(1, 'weeks').isAfter(now)) {
       throw new BadRequestException();
@@ -135,7 +141,13 @@ export class RefsService {
       authUser,
     });
 
-    let wallet = authUser.wallet;
+    let wallet = await this.walletEntityRepository.findOneOrFail({
+      where: {
+        user: {
+          id: authUser.id,
+        },
+      },
+    });
     const now = moment();
     const lastClaimDate = moment(wallet.lastRefsClaimDateTime);
 

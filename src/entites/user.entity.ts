@@ -60,6 +60,7 @@ export class UserEntity {
   })
   @OneToOne(() => WalletEntity, (wallet) => wallet.user, {
     onDelete: 'CASCADE',
+    cascade: true,
   })
   wallet: WalletEntity;
 

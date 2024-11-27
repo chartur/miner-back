@@ -104,8 +104,6 @@ export class RefsService {
       .where('refs.referrerId = :userId', { userId: user.id })
       .getRawOne<{ total }>();
 
-    console.log(total);
-
     if (!total) {
       throw new BadRequestException();
     }
@@ -131,6 +129,7 @@ export class RefsService {
 
     const moreUsersCount =
       users.length > 0 ? Number(users[0].totalCount) - users.length : 0;
+
     return {
       total: parsedTotal,
       users,

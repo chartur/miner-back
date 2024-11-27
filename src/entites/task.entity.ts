@@ -9,8 +9,8 @@ import { UserEntity } from './user.entity';
 @Entity('tasks')
 export class TaskEntity {
   @ApiProperty({ example: 3, description: 'Internal ID of task' })
-  @PrimaryGeneratedColumn('increment', { type: 'int' })
-  id: number;
+  @PrimaryGeneratedColumn('uuid')
+  id: string;
 
   @ApiProperty({ example: 'Join Channel', description: 'The title of task' })
   @Column({ nullable: false })

@@ -16,7 +16,7 @@ export class InsertTasksData1732103634415 implements MigrationInterface {
       description:
         'Stay updated and inspired! Subscribe to our YouTube channel for the latest videos, tutorials, and exclusive content tailored just for you!',
       profit: 750,
-      link: 'https://www.youtube.com',
+      link: 'https://www.youtube.com/@Tibtonic',
       icon: './assets/tasks/icon-youtube.png',
     },
     {
@@ -26,7 +26,7 @@ export class InsertTasksData1732103634415 implements MigrationInterface {
         'Join our community on X for real-time updates, insights, and conversations! Follow us to stay connected and never miss out on the latest buzz.',
       isComplete: false,
       profit: 500,
-      link: 'https://x.com/',
+      link: 'https://x.com/TibTonicApp',
       icon: './assets/tasks/icon-x.png',
     },
     {
@@ -35,7 +35,7 @@ export class InsertTasksData1732103634415 implements MigrationInterface {
         'Follow us on instagram to stay connected and never miss out on the latest updates',
       isComplete: true,
       profit: 500,
-      link: 'https://www.instagram.com/',
+      link: 'https://www.instagram.com/Tibtonic',
       icon: './assets/tasks/icon-instagram.png',
     },
   ];

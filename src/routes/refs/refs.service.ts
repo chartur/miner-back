@@ -94,7 +94,7 @@ export class RefsService {
       },
     });
     const lastClaimDate = moment(wallet.lastRefsClaimDateTime);
-    if (lastClaimDate.add(1, 'weeks').isAfter(now)) {
+    if (lastClaimDate.add(3, 'days').isAfter(now)) {
       throw new BadRequestException();
     }
 
@@ -104,14 +104,16 @@ export class RefsService {
       .where('refs.referrerId = :userId', { userId: user.id })
       .getRawOne<{ total }>();
 
-    const parsedTotal = new BigDecimal(total)
-      .round(6)
-      .stripTrailingZero()
-      .getValue();
+    console.log(total);
 
     if (!total) {
       throw new BadRequestException();
     }
+
+    const parsedTotal = new BigDecimal(total)
+      .round(6)
+      .stripTrailingZero()
+      .getValue();
 
     const users = await this.refEntityRepository
       .createQueryBuilder('refs')
@@ -151,7 +153,7 @@ export class RefsService {
     const now = moment();
     const lastClaimDate = moment(wallet.lastRefsClaimDateTime);
 
-    if (lastClaimDate.add(1, 'weeks').isAfter(now)) {
+    if (lastClaimDate.add(3, 'days').isAfter(now)) {
       throw new BadRequestException();
     }
 

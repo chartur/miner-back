@@ -1,0 +1,11 @@
+<b>Welcome {{ name }}!</b>
+
+Mine TON, Earn Tib Coin, and Boost Your Rewards!
+TibTonics App lets you mine TON Coin and collect Tib Coin—all within Telegram. Boost your mining power and watch your earnings grow!
+
+<b>How It Works:</b>
+Mine TON Coin and earn Tib Coin 🤑.
+Buy boosts to increase mining speed ⚡.
+Track your progress and withdraw anytime 📈.
+
+Start mining with TibTonics App now and power up your TON & Tib Coin rewards! 💥

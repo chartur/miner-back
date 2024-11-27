@@ -55,6 +55,13 @@ export class WalletEntity {
   lastClaimDateTime: Date;
 
   @ApiProperty({
+    example: true,
+    description: 'If already notified for claim',
+  })
+  @Column({ nullable: false, default: false, type: 'boolean' })
+  notifiedForClaim: boolean;
+
+  @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',
     description: 'The Last claim datetime of refs profit',
   })

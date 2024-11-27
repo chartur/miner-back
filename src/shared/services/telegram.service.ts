@@ -6,6 +6,7 @@ import { TelegramChannelUserValidTypes } from '../../core/models/enums/telegram-
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { TelegramSendMessage } from '../../core/models/interfaces/telegram-send-message';
+import { Language } from '../../core/models/enums/language';
 
 @Injectable({
   scope: Scope.DEFAULT,
@@ -18,20 +19,6 @@ export class TelegramService {
   constructor(private httpService: HttpService) {
     this.init();
   }
-
-  // public sendMessageInTheChannel(message: string) {
-  //   const markup = Markup.inlineKeyboard([
-  //     Markup.button.url('🛒 Տեսնել ավելին', this.botLink),
-  //   ]);
-  //   this.bot.telegram.sendPhoto(
-  //     this.channelusername,
-  //     { url: this.logoUrl },
-  //     {
-  //       ...markup,
-  //       caption: message,
-  //     },
-  //   );
-  // }
 
   private async init(): Promise<void> {
     this._telegramAction = new TelegramActions();
@@ -104,6 +91,7 @@ export class TelegramService {
           { url: data.photoUrl },
           {
             caption: data.text,
+            parse_mode: data.parseMode,
             ...data.buttons,
           },
         )
@@ -112,7 +100,21 @@ export class TelegramService {
     return this._bot.telegram
       .sendMessage(data.chatId, data.text, {
         ...data.buttons,
+        parse_mode: data.parseMode,
       })
       .then();
+  }
+
+  public setMessageInChannel(
+    data: Omit<TelegramSendMessage, 'chatId'>,
+  ): Promise<void> {
+    return this.sendMessage({
+      ...data,
+      chatId: this._telegramAction.tChannelId,
+    });
+  }
+
+  public getTranslationText(lang: Language, file: string): Promise<string> {
+    return this._telegramAction.getTranslationText(lang, file);
   }
 }

@@ -178,6 +178,7 @@ export class WalletService {
       }
 
       wallet.claimCount++;
+      wallet.notifiedForClaim = false;
       wallet.lastClaimDateTime = now.toDate();
       const tonByNonoton = parseInt(
         this.configService.get<string>('TON_BY_NONOTON'),

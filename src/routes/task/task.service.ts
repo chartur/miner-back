@@ -71,7 +71,7 @@ export class TaskService {
       .add(new BigDecimal(task.profit))
       .getValue();
     userEntity.completedTasks.push(task);
-    await this.userEntityRepository.save(userEntity, {  });
+    await this.userEntityRepository.save(userEntity);
 
     return {
       total: userEntity.wallet.tibCoins,

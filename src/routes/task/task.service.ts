@@ -1,4 +1,4 @@
-import { Injectable, Logger } from '@nestjs/common';
+import { BadRequestException, Injectable, Logger } from '@nestjs/common';
 import { TaskWithStateDto } from '../../core/models/dto/response/task-with-state.dto';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TaskEntity } from '../../entites/task.entity';
@@ -33,7 +33,6 @@ export class TaskService {
       })
       .then((user) => user.completedTasks.map((t) => t.id));
 
-    console.log(completedTaskIds);
     return this.taskEntityRepository.find().then((result) => {
       return result.map((task) => ({
         ...task,
@@ -50,6 +49,17 @@ export class TaskService {
       user,
       body,
     });
+
+    const sameTaskCompletedCount = await this.userEntityRepository
+      .createQueryBuilder('user')
+      .innerJoin('user.completedTasks', 'task')
+      .where('user.id = :userId', { userId: user.id })
+      .andWhere('task.id = :taskId', { taskId: body.taskId })
+      .getCount();
+
+    if (sameTaskCompletedCount > 0) {
+      throw new BadRequestException('You have already completed the task!');
+    }
 
     const userEntity = await this.userEntityRepository.findOneOrFail({
       where: {

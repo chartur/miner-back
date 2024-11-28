@@ -82,13 +82,19 @@ export class RefsService {
 
   public async getRefsProfit(user: UserEntity): Promise<RefsProfitDto> {
     this.logger.log('[Refs] get my profit', {
-      userId: user.id,
+      user,
     });
 
     const now = moment();
-    const wallet = user.wallet;
+    const wallet = await this.walletEntityRepository.findOneOrFail({
+      where: {
+        user: {
+          id: user.id,
+        },
+      },
+    });
     const lastClaimDate = moment(wallet.lastRefsClaimDateTime);
-    if (lastClaimDate.add(1, 'weeks').isAfter(now)) {
+    if (lastClaimDate.add(3, 'days').isAfter(now)) {
       throw new BadRequestException();
     }
 
@@ -98,14 +104,14 @@ export class RefsService {
       .where('refs.referrerId = :userId', { userId: user.id })
       .getRawOne<{ total }>();
 
+    if (!total) {
+      throw new BadRequestException();
+    }
+
     const parsedTotal = new BigDecimal(total)
       .round(6)
       .stripTrailingZero()
       .getValue();
-
-    if (!total) {
-      throw new BadRequestException();
-    }
 
     const users = await this.refEntityRepository
       .createQueryBuilder('refs')
@@ -123,6 +129,7 @@ export class RefsService {
 
     const moreUsersCount =
       users.length > 0 ? Number(users[0].totalCount) - users.length : 0;
+
     return {
       total: parsedTotal,
       users,
@@ -135,11 +142,17 @@ export class RefsService {
       authUser,
     });
 
-    let wallet = authUser.wallet;
+    let wallet = await this.walletEntityRepository.findOneOrFail({
+      where: {
+        user: {
+          id: authUser.id,
+        },
+      },
+    });
     const now = moment();
     const lastClaimDate = moment(wallet.lastRefsClaimDateTime);
 
-    if (lastClaimDate.add(1, 'weeks').isAfter(now)) {
+    if (lastClaimDate.add(3, 'days').isAfter(now)) {
       throw new BadRequestException();
     }
 

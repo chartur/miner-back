@@ -16,6 +16,7 @@ import { GlobalServiceModule } from './shared/global-service.module';
 import { ConfigModule } from './routes/config/config.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronesModule } from './core/crones/crons.module';
+import { TaskModule } from './routes/task/task.module';
 
 @Module({
   imports: [
@@ -55,6 +56,7 @@ import { CronesModule } from './core/crones/crons.module';
     WalletModule,
     BoostModule,
     ConfigModule,
+    TaskModule,
   ],
   providers: [JwtService, ParseUserGuard],
   controllers: [AppController],

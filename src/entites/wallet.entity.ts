@@ -23,7 +23,9 @@ export class WalletEntity {
     description: 'The owner user of the wallet',
   })
   @JoinColumn()
-  @OneToOne(() => UserEntity, (user) => user.wallet)
+  @OneToOne(() => UserEntity, (user) => user.wallet, {
+    onDelete: 'CASCADE',
+  })
   user: UserEntity;
 
   @ApiProperty({
@@ -41,12 +43,23 @@ export class WalletEntity {
   @Column({ default: 0 })
   nonotons: number;
 
+  @ApiProperty({ example: 345000, description: 'Tib coins count' })
+  @Column({ default: 0, type: 'bigint' })
+  tibCoins: string;
+
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',
     description: 'Last claim datetime',
   })
   @Column({ nullable: true, type: 'timestamp with time zone' })
   lastClaimDateTime: Date;
+
+  @ApiProperty({
+    example: true,
+    description: 'If already notified for claim',
+  })
+  @Column({ nullable: false, default: false, type: 'boolean' })
+  notifiedForClaim: boolean;
 
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',

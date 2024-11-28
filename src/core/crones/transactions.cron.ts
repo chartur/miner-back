@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron, CronExpression } from '@nestjs/schedule';
+import { Cron } from '@nestjs/schedule';
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionEntity } from '../../entites/transaction.entity';
 import { AppTonClient } from '../../shared/services/app-ton-client.service';

@@ -82,7 +82,7 @@ export class UsersService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { photoUrl, ...rest } = userEntity;
+    const { wallet, boosts, ...rest } = userEntity;
     const token = await this.authService.signIn(rest);
     return {
       token,
@@ -103,7 +103,7 @@ export class UsersService {
     });
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { photoUrl, ...rest } = userEntity;
+    const { wallet, boosts, ...rest } = userEntity;
     const token = await this.authService.signIn(rest);
     return {
       token,

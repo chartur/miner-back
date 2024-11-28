@@ -11,6 +11,7 @@ import { BoostService } from '../../../routes/boost/boost.service';
 import { WalletEntity } from '../../../entites/wallet.entity';
 import { TelegramService } from '../../../shared/services/telegram.service';
 import { Markup } from 'telegraf';
+import { BoostLevels } from '../enums/boost-levels';
 
 export class ParsedTransaction {
   private _invoiceId?: string;
@@ -71,22 +72,30 @@ export class ParsedTransaction {
     }
     return this.boostService
       .activate(this.user, this._invoice.action, now)
-      .then(() => {
-        return this.sendSuccessActivationMessage();
+      .then((boost) => {
+        return this.sendSuccessActivationMessage(boost.boostLevel);
       });
   }
 
-  public async sendSuccessActivationMessage(): Promise<void> {
-    const user = await this.user;
+  public async sendSuccessActivationMessage(
+    boostLevel: BoostLevels,
+  ): Promise<void> {
+    const user = this.user;
+    if (!user) {
+      return;
+    }
+    const text = await this.telegramService.getTranslationText(
+      user.languageCode,
+      `${boostLevel}-boost-activation`,
+    );
     return this.telegramService
       .sendMessage({
         chatId: user.tUserId,
-        text: 'Your boost successfully activated. Please enjoy!',
-        photoUrl:
-          'https://cdn3d.iconscout.com/3d/premium/thumb/boost-marketing-3d-icon-download-in-png-blend-fbx-gltf-file-formats--financial-startup-launch-business-digital-pack-icons-8580010.png?f=webp',
+        text: text,
+        photoUrl: this.getBoostsActivationImage(boostLevel),
         buttons: Markup.inlineKeyboard([
           Markup.button.webApp(
-            '💸Play',
+            '💸 Play',
             this.telegramService.getAppUrl().toString(),
           ),
         ]),
@@ -124,6 +133,17 @@ export class ParsedTransaction {
     );
     if (isUUID(payloadString)) {
       this._invoiceId = payloadString;
+    }
+  }
+
+  private getBoostsActivationImage(boost: BoostLevels): string {
+    switch (boost) {
+      case BoostLevels.MINI:
+        return 'https://drive.google.com/uc?export=view&id=18rxuDL4Ztm5vG3A9a2umpRBcqTO0a5v8';
+      case BoostLevels.MAJOR:
+        return 'https://drive.google.com/uc?export=view&id=1woRzyrg3TDsA5jR6LQL-deZ9rv3VrLfl';
+      case BoostLevels.MEGA:
+        return 'https://drive.google.com/uc?export=view&id=18t-SIYH_CqMjz-EEGJQSx7p3H6Eh4Sph';
     }
   }
 }

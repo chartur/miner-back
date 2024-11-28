@@ -13,9 +13,18 @@ import { HttpModule } from '@nestjs/axios';
 import { ConfigService } from '@nestjs/config';
 import { BoostService } from '../../routes/boost/boost.service';
 import { TransactionsCron } from './transactions.cron';
+import { ClaimNotificationCron } from './claim-notification.cron';
+import { InvoicesCron } from './invoices.cron';
 
 @Module({
-  providers: [TransactionsCron, WalletService, ConfigService, BoostService],
+  providers: [
+    TransactionsCron,
+    ClaimNotificationCron,
+    InvoicesCron,
+    WalletService,
+    ConfigService,
+    BoostService,
+  ],
   // providers: [WalletService, ConfigService, BoostService],
   imports: [
     GlobalServiceModule,

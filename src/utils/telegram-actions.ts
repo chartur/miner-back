@@ -1,22 +1,28 @@
 import { Context, Markup, Telegraf } from 'telegraf';
+import { Language } from '../core/models/enums/language';
+import { join } from 'path';
+import { readFile } from 'fs/promises';
 
 export class TelegramActions {
   public readonly tChannelLink = process.env.TELEGRAM_COMMUNITY_CHANNEL_LINK;
   public readonly tChannelId = process.env.TELEGRAM_COMMUNITY_CHANNEL_ID;
   public readonly appUrl = process.env.APP_URL;
+  public readonly tBotUrl = process.env.TELEGRAM_BOT_URL;
   private _bot: Telegraf;
   private readonly TELEGRAM_BOT_KEY = process.env.TELEGRAM_BOT_KEY;
   private readonly logoUrl = process.env.TELEGRAM_LOGO_URL;
   private languageBasedText = {
     en: {
-      startAppButton: '💸 Start Mining',
-      startAppButtonFromRef: '💸 Start Mining with friend',
-      joinCommunity: 'ℹ️ Join Community',
+      startAppButton: '⭐️Start Mining ⭐',
+      startAppButtonFromRef: '⭐ Start Mining with friend ⭐',
+      joinCommunity: '🚀️Join Community 🚀',
+      policy: '💡Information 💡',
     },
     ru: {
-      startAppButton: '💸 Начать майнинг',
-      startAppButtonFromRef: '💸 Начать майнинг с другом',
-      joinCommunity: 'ℹ️ Присоединяйтесь к сообществу',
+      startAppButton: '⭐ Начать майнинг ⭐',
+      startAppButtonFromRef: '⭐ Начать майнинг с другом ⭐',
+      joinCommunity: '🚀 Присоединяйтесь к сообществу 🚀',
+      policy: '💡 Информация 💡',
     },
   };
 
@@ -51,6 +57,10 @@ export class TelegramActions {
           this.languageBasedText[lang].joinCommunity,
           this.tChannelLink,
         ),
+        Markup.button.url(
+          this.languageBasedText[lang].policy,
+          this.tChannelLink,
+        ),
       ],
       {
         wrap: () => true,
@@ -65,7 +75,11 @@ export class TelegramActions {
       { url: this.logoUrl },
       {
         ...markup,
-        caption: 'TEST',
+        caption: await this.getTranslationText(
+          lang,
+          'startup-description',
+        ).then((res) => res.replace('{{ name }}', ctx.from.first_name)),
+        parse_mode: 'HTML',
       },
     );
   }
@@ -95,13 +109,20 @@ export class TelegramActions {
     });
   }
 
-  private getProperLanguage(userLang: string): string {
+  public getTranslationText(lang: Language, file: string): Promise<string> {
+    return readFile(
+      join(__dirname, '..', 'assets', 'telegram-assets', lang, `${file}.txt`),
+      'utf-8',
+    );
+  }
+
+  private getProperLanguage(userLang: string): Language {
     switch (userLang) {
       case 'ru':
       case 'en':
-        return userLang;
+        return userLang as Language;
       default:
-        return 'en';
+        return Language.EN;
     }
   }
 }

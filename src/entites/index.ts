@@ -7,6 +7,7 @@ import { TransactionEntity } from './transaction.entity';
 import { InvoiceEntity } from './invoice.entity';
 import { SettingsEntity } from './settings.entity';
 import { TaskEntity } from './task.entity';
+import { UserSettingsEntity } from './user-settings.entity';
 
 export const ENTITIES = [
   UserEntity,
@@ -18,4 +19,5 @@ export const ENTITIES = [
   InvoiceEntity,
   SettingsEntity,
   TaskEntity,
+  UserSettingsEntity,
 ];

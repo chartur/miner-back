@@ -1,12 +1,13 @@
 import { Injectable, Logger, Scope } from '@nestjs/common';
 import { TelegramActions } from '../../utils/telegram-actions';
-import { TelegramActionTypes } from '../../core/models/enums/telegram-action-types';
 import { Telegraf } from 'telegraf';
 import { TelegramChannelUserValidTypes } from '../../core/models/enums/telegram-channel-user-valid-types';
 import { HttpService } from '@nestjs/axios';
 import { lastValueFrom } from 'rxjs';
 import { TelegramSendMessage } from '../../core/models/interfaces/telegram-send-message';
 import { Language } from '../../core/models/enums/language';
+import { InvoiceEntity } from '../../entites/invoice.entity';
+import { EventEmitter2 } from '@nestjs/event-emitter';
 
 @Injectable({
   scope: Scope.DEFAULT,
@@ -16,7 +17,10 @@ export class TelegramService {
   private _telegramAction: TelegramActions;
   private _bot: Telegraf;
 
-  constructor(private httpService: HttpService) {
+  constructor(
+    private httpService: HttpService,
+    private eventEmitter: EventEmitter2,
+  ) {
     this.init();
   }
 
@@ -31,12 +35,17 @@ export class TelegramService {
       cxt.answerPreCheckoutQuery(true);
     });
 
+    this._bot.on('successful_payment', (ctx) => {
+      const message = ctx.message as any;
+      this.eventEmitter.emit(
+        'boost.invoice.successful',
+        message.successful_payment,
+      );
+    });
+
     this._bot.on('callback_query', (ctx) => {
       const action: string = (ctx.callbackQuery as any).data;
-      switch (action) {
-        case TelegramActionTypes.SEND_INVOICE:
-          return this._telegramAction.sendInvoice(ctx);
-      }
+      console.log(action);
     });
 
     this._bot.launch();
@@ -112,6 +121,13 @@ export class TelegramService {
       ...data,
       chatId: this._telegramAction.tChannelId,
     });
+  }
+
+  public createStarsInvoiceLink(
+    title: string,
+    invoice: InvoiceEntity,
+  ): Promise<string> {
+    return this._telegramAction.createInvoiceByStars(title, invoice);
   }
 
   public getTranslationText(lang: Language, file: string): Promise<string> {

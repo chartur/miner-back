@@ -23,7 +23,7 @@ export class BoostEntity {
     example: UserEntity,
     description: 'The owner user of the boost',
   })
-  @ManyToOne(() => UserEntity, (user) => user.boosts)
+  @ManyToOne(() => UserEntity, (user) => user.boosts, { onDelete: 'CASCADE' })
   user: UserEntity;
 
   @ApiProperty({

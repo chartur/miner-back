@@ -17,12 +17,14 @@ import { ConfigModule } from './routes/config/config.module';
 import { ScheduleModule } from '@nestjs/schedule';
 import { CronesModule } from './core/crones/crons.module';
 import { TaskModule } from './routes/task/task.module';
+import { EventEmitterModule } from "@nestjs/event-emitter";
 
 @Module({
   imports: [
     GlobalConfigModule.forRoot({
       envFilePath: `.${process.env.mode || 'local'}.env`,
     }),
+    EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [GlobalConfigModule],
       useFactory: (config: GlobalConfigService) => {

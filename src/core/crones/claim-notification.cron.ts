@@ -4,10 +4,11 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, LessThan, Repository } from 'typeorm';
 import { WalletEntity } from '../../entites/wallet.entity';
 import { ConfigService } from '@nestjs/config';
-import moment from 'moment';
 import { TelegramService } from '../../shared/services/telegram.service';
 import { Language } from '../models/enums/language';
 import { Markup } from 'telegraf';
+import { UserSettingsEntity } from '../../entites/user-settings.entity';
+import moment from 'moment';
 
 @Injectable()
 export class ClaimNotificationCron {
@@ -24,6 +25,8 @@ export class ClaimNotificationCron {
   };
 
   constructor(
+    @InjectRepository(UserSettingsEntity)
+    private userSettingsEntityRepository: Repository<UserSettingsEntity>,
     @InjectRepository(WalletEntity)
     private walletEntityRepository: Repository<WalletEntity>,
     private configService: ConfigService,
@@ -34,18 +37,27 @@ export class ClaimNotificationCron {
   public async handleCron(): Promise<void> {
     this.logger.log('[ClaimNotificationCron] Cron started');
     try {
-      const period = this.configService.get<number>('PERIOD_WITH_SECONDS');
-      const wallets = await this.walletEntityRepository.find({
-        where: {
-          lastClaimDateTime: LessThan(
-            moment().subtract(period, 'seconds').toDate(),
-          ),
-          notifiedForClaim: false,
-        },
-        relations: {
-          user: true,
-        },
-      });
+      const period = Number(
+        this.configService.get<number>('PERIOD_WITH_SECONDS'),
+      );
+      const now = moment();
+      const lastClaimDateOffset = now.subtract(period).toDate();
+      const wallets = await this.walletEntityRepository
+        .createQueryBuilder('wallet')
+        .innerJoin('wallet.user', 'user')
+        .innerJoin('user.settings', 'settings')
+        .where(
+          'settings.claimNotificationEnabled = :claimNotificationEnabled',
+          { claimNotificationEnabled: true },
+        )
+        .andWhere('wallet.lastClaimDateTime < :lastClaimDateOffset', {
+          lastClaimDateOffset,
+        })
+        .andWhere('wallet.notifiedForClaim = :notified', {
+          notified: false,
+        })
+        .addSelect(['user', 'wallet', 'settings'])
+        .getMany();
 
       const [enText, ruText] = await Promise.all([
         await this.telegramService.getTranslationText(
@@ -81,6 +93,13 @@ export class ClaimNotificationCron {
           id: In(walletIds),
         },
         { notifiedForClaim: true },
+      );
+      await this.userSettingsEntityRepository.update(
+        {
+          claimNotificationEnabled: true,
+          claimNotificationExpiration: LessThan(now.toDate()),
+        },
+        { claimNotificationEnabled: false, claimNotificationExpiration: null },
       );
 
       this.logger.log('[ClaimNotificationCron] Notification sent to claim', {

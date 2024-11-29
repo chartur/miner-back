@@ -11,6 +11,7 @@ import { AuthUserDto } from '../../core/models/dto/response/auth-user.dto';
 import { DynamicSyncData } from '../../core/models/interfaces/dynamic-sync-data';
 import { RefsService } from '../refs/refs.service';
 import { WalletEntity } from '../../entites/wallet.entity';
+import { UserSettingsEntity } from "../../entites/user-settings.entity";
 
 @Injectable()
 export class UsersService {
@@ -44,7 +45,7 @@ export class UsersService {
       where: {
         tUserId: user.id.toString(),
       },
-      relations: ['wallet', 'boosts'],
+      relations: ['wallet', 'boosts', 'settings'],
     });
     const newUserData = {
       tUserId: user.id.toString(),
@@ -57,14 +58,24 @@ export class UsersService {
     if (!existingUserData) {
       userEntity = await this.userEntityRepository.save({
         ...newUserData,
+        wallet: new WalletEntity(),
+        settings: new UserSettingsEntity(),
       });
-      await this.walletEntityRepository.save({ user: userEntity });
+      await this.userEntityRepository.save(userEntity);
       if (ref) {
         this.refsService.create(userEntity, ref);
       }
     } else {
+      let needToUpdate = false;
       if (!existingUserData.wallet) {
         existingUserData.wallet = new WalletEntity();
+        needToUpdate = true;
+      }
+      if (!existingUserData.settings) {
+        existingUserData.settings = new UserSettingsEntity();
+        needToUpdate = true;
+      }
+      if (needToUpdate) {
         await this.userEntityRepository.save(existingUserData);
       }
       const isSame = Object.keys(newUserData).every(
@@ -82,7 +93,7 @@ export class UsersService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { wallet, boosts, ...rest } = userEntity;
+    const { wallet, boosts, settings, ...rest } = userEntity;
     const token = await this.authService.signIn(rest);
     return {
       token,
@@ -120,7 +131,7 @@ export class UsersService {
       where: {
         id: authUser.id,
       },
-      relations: ['wallet', 'boosts'],
+      relations: ['wallet', 'boosts', 'settings'],
     });
   }
 

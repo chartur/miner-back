@@ -15,6 +15,7 @@ import { BoostService } from '../../routes/boost/boost.service';
 import { TransactionsCron } from './transactions.cron';
 import { ClaimNotificationCron } from './claim-notification.cron';
 import { InvoicesCron } from './invoices.cron';
+import { UserSettingsEntity } from '../../entites/user-settings.entity';
 
 @Module({
   providers: [
@@ -37,6 +38,7 @@ import { InvoicesCron } from './invoices.cron';
       WalletEntity,
       BoostEntity,
       RefEntity,
+      UserSettingsEntity,
     ]),
   ],
 })

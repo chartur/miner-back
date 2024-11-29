@@ -2,6 +2,7 @@ import { Context, Markup, Telegraf } from 'telegraf';
 import { Language } from '../core/models/enums/language';
 import { join } from 'path';
 import { readFile } from 'fs/promises';
+import { InvoiceEntity } from '../entites/invoice.entity';
 
 export class TelegramActions {
   public readonly tChannelLink = process.env.TELEGRAM_COMMUNITY_CHANNEL_LINK;
@@ -84,15 +85,17 @@ export class TelegramActions {
     );
   }
 
-  public sendInvoice(ctx): void {
-    const title = 'Digital Item';
-    const description = 'Purchase this amazing digital item!';
-    const payload = 'UniquePayload';
+  public createInvoiceByStars(
+    title: string,
+    invoice: InvoiceEntity,
+  ): Promise<string> {
+    const description = invoice.details;
+    const payload = invoice.id;
     const providerToken = ''; // empty for XTR
     const currency = 'XTR'; // Set currency to XTR
-    const price = 1; // Price in XTR (adjust as needed)
+    const price = invoice.amount; // Price in XTR (adjust as needed)
 
-    ctx.sendInvoice({
+    return this.bot.telegram.createInvoiceLink({
       title,
       description,
       payload,
@@ -100,12 +103,10 @@ export class TelegramActions {
       currency,
       prices: [
         {
-          label: 'Digital Item',
+          label: title,
           amount: price,
         },
       ],
-      start_parameter: 'test',
-      is_flexible: false,
     });
   }
 

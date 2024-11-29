@@ -34,7 +34,9 @@ export class TransactionEntity {
     example: UserEntity,
     description: 'The owner user of the boost',
   })
-  @ManyToOne(() => UserEntity, (user) => user.transactions)
+  @ManyToOne(() => UserEntity, (user) => user.transactions, {
+    onDelete: 'CASCADE',
+  })
   user: UserEntity;
 
   @ApiProperty({

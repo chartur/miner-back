@@ -33,7 +33,7 @@ export class ClaimNotificationCron {
     private telegramService: TelegramService,
   ) {}
 
-  @Cron(CronExpression.EVERY_MINUTE)
+  @Cron(CronExpression.EVERY_5_SECONDS)
   public async handleCron(): Promise<void> {
     this.logger.log('[ClaimNotificationCron] Cron started');
     try {
@@ -41,7 +41,7 @@ export class ClaimNotificationCron {
         this.configService.get<number>('PERIOD_WITH_SECONDS'),
       );
       const now = moment();
-      const lastClaimDateOffset = now.subtract(period).toDate();
+      const lastClaimDateOffset = now.subtract(period, 'seconds').toDate();
       const wallets = await this.walletEntityRepository
         .createQueryBuilder('wallet')
         .innerJoin('wallet.user', 'user')

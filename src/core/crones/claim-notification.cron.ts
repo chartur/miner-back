@@ -33,7 +33,7 @@ export class ClaimNotificationCron {
     private telegramService: TelegramService,
   ) {}
 
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron(CronExpression.EVERY_MINUTE)
   public async handleCron(): Promise<void> {
     this.logger.log('[ClaimNotificationCron] Cron started');
     try {

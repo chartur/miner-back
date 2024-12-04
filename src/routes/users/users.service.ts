@@ -4,14 +4,14 @@ import { SyncUserDto } from '../../core/models/dto/sync-user.dto';
 import { telegramDataValidator } from '../../utils/telegram-data-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TelegramService } from '../../shared/services/telegram.service';
 import { Language } from '../../core/models/enums/language';
 import { AuthService } from '../../shared/services/auth.service';
 import { AuthUserDto } from '../../core/models/dto/response/auth-user.dto';
 import { DynamicSyncData } from '../../core/models/interfaces/dynamic-sync-data';
 import { RefsService } from '../refs/refs.service';
 import { WalletEntity } from '../../entites/wallet.entity';
-import { UserSettingsEntity } from "../../entites/user-settings.entity";
+import { UserSettingsEntity } from '../../entites/user-settings.entity';
+import { TelegramClient } from '../../clients/telegram.client';
 
 @Injectable()
 export class UsersService {
@@ -22,7 +22,7 @@ export class UsersService {
     private userEntityRepository: Repository<UserEntity>,
     @InjectRepository(WalletEntity)
     private walletEntityRepository: Repository<WalletEntity>,
-    private telegramService: TelegramService,
+    private telegramClient: TelegramClient,
     private authService: AuthService,
     private refsService: RefsService,
   ) {}
@@ -136,10 +136,8 @@ export class UsersService {
   }
 
   public async isUserSubscribed(authUser: UserEntity): Promise<boolean> {
-    const isSubscribed =
-      await this.telegramService.isUserSubscribedToCommunityChannel(
-        authUser.tUserId,
-      );
-    return isSubscribed;
+    return this.telegramClient.isUserSubscribedToCommunityChannel(
+      authUser.tUserId,
+    );
   }
 }

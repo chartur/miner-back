@@ -26,3 +26,24 @@ export const telegramDataValidator = (
 
   return calculated_hash === hash;
 };
+
+export const tgBotMicroValidator = (
+  date: number,
+  data: any,
+): string => {
+
+  const payload = {
+    lt: date,
+    data,
+  };
+
+  const secret_key = crypto
+    .createHmac('sha256', process.env.SECRET_KEY)
+    .update(process.env.TELEGRAM_BOT_KEY)
+    .digest();
+
+  return crypto
+    .createHmac('sha256', secret_key)
+    .update(JSON.stringify(payload))
+    .digest('hex');
+};

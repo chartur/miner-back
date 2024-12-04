@@ -9,9 +9,10 @@ import { InvoiceEntity } from '../../../entites/invoice.entity';
 import { WalletService } from '../../../routes/wallet/wallet.service';
 import { BoostService } from '../../../routes/boost/boost.service';
 import { WalletEntity } from '../../../entites/wallet.entity';
-import { TelegramService } from '../../../shared/services/telegram.service';
 import { Markup } from 'telegraf';
 import { BoostLevels } from '../enums/boost-levels';
+import { TelegramClient } from '../../../clients/telegram.client';
+import { TelegramHelper } from '../../../utils/telegram.helper';
 
 export class ParsedTransaction {
   private _invoiceId?: string;
@@ -23,7 +24,7 @@ export class ParsedTransaction {
     private tx: Transaction,
     private walletService: WalletService,
     private boostService: BoostService,
-    private telegramService: TelegramService,
+    private telegramClient: TelegramClient,
   ) {
     this.init();
   }
@@ -84,23 +85,18 @@ export class ParsedTransaction {
     if (!user) {
       return;
     }
-    const text = await this.telegramService.getTranslationText(
+    const text = await TelegramHelper.getTranslationText(
       user.languageCode,
       `${boostLevel}-boost-activation`,
     );
-    return this.telegramService
-      .sendMessage({
-        chatId: user.tUserId,
-        text: text,
-        photoUrl: this.getBoostsActivationImage(boostLevel),
-        buttons: Markup.inlineKeyboard([
-          Markup.button.webApp(
-            '💸 Play',
-            this.telegramService.getAppUrl().toString(),
-          ),
-        ]),
-      })
-      .then();
+    return this.telegramClient.sendMessage({
+      chatId: user.tUserId,
+      text: text,
+      photoUrl: this.getBoostsActivationImage(boostLevel),
+      buttons: Markup.inlineKeyboard([
+        Markup.button.webApp('💸 Play', TelegramHelper.getAppUrl().toString()),
+      ]),
+    });
   }
 
   public getDataForSave(): Partial<TransactionEntity> {

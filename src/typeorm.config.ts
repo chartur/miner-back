@@ -5,7 +5,7 @@ import { ConfigService } from '@nestjs/config';
 import { DataSourceOptions } from 'typeorm/data-source/DataSourceOptions';
 
 config({
-  path: `.${process.env.mode || 'local'}.env`,
+  path: `.${process.env.MODE || 'local'}.env`,
 });
 
 const configService: ConfigService = new ConfigService();

@@ -16,6 +16,7 @@ import { TransactionsCron } from './transactions.cron';
 import { ClaimNotificationCron } from './claim-notification.cron';
 import { InvoicesCron } from './invoices.cron';
 import { UserSettingsEntity } from '../../entites/user-settings.entity';
+import { ClientsModule } from '../../clients/clients.module';
 
 @Module({
   providers: [
@@ -28,8 +29,9 @@ import { UserSettingsEntity } from '../../entites/user-settings.entity';
   ],
   // providers: [WalletService, ConfigService, BoostService],
   imports: [
-    GlobalServiceModule,
     HttpModule,
+    ClientsModule,
+    GlobalServiceModule,
     TypeOrmModule.forFeature([
       TransactionEntity,
       InvoiceEntity,

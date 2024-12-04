@@ -9,6 +9,11 @@
         "include": "../assets",
         "outDir": "build/assets",
         "watchAssets": true
+      },
+      {
+        "include": "../.local.env",
+        "outDir": "build/.local.env",
+        "watchAssets": false
       }
     ]
   }

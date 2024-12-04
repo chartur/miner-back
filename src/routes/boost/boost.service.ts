@@ -12,10 +12,11 @@ import { InvoiceEntity } from '../../entites/invoice.entity';
 import { ConfigService } from '@nestjs/config';
 import { InvoiceAction } from '../../core/models/enums/invoice-action';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
-import { TelegramService } from '../../shared/services/telegram.service';
 import { LinkResponseDto } from '../../core/models/dto/response/link.response.dto';
 import { OnEvent } from '@nestjs/event-emitter';
 import { SuccessPayment } from '../../core/models/interfaces/success-payment';
+import { TelegramClient } from '../../clients/telegram.client';
+import { TelegramHelper } from "../../utils/telegram.helper";
 
 @Injectable()
 export class BoostService {
@@ -31,7 +32,7 @@ export class BoostService {
     private boostDetailsService: BoostDetailsService,
     private transactionsService: TransactionsService,
     private configService: ConfigService,
-    private telegramService: TelegramService,
+    private telegramClient: TelegramClient,
   ) {}
 
   public getUserBoost(authUser: UserEntity): Promise<BoostEntity | null> {
@@ -122,11 +123,11 @@ export class BoostService {
       action: InvoiceAction.CLAIM_NOTIFICATION,
     });
     const [title, description] = await Promise.all([
-      this.telegramService.getTranslationText(
+      TelegramHelper.getTranslationText(
         user.languageCode,
         'claim-notifier-title',
       ),
-      this.telegramService.getTranslationText(
+      TelegramHelper.getTranslationText(
         user.languageCode,
         'claim-notifier-description',
       ),
@@ -140,10 +141,11 @@ export class BoostService {
       details: description,
       user,
     });
-    const link = await this.telegramService.createStarsInvoiceLink(
+    const link = await this.telegramClient.createStarsInvoiceLink(
       title,
       invoice,
     );
+    console.log(link);
     return {
       link,
     };

@@ -1,7 +1,13 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Ctx, Start, Update } from 'nestjs-telegraf';
+import { Ctx, On, Start, Update } from 'nestjs-telegraf';
 import { Context, Markup } from 'telegraf';
 import { TelegramHelper } from '../../utils/telegram.helper';
+import { tgBotMicroValidator } from '../../utils/telegram-data-validator';
+import { SecurePayloadDto } from '../../core/models/dto/telegram-microservice/secure-payload.dto';
+import { SuccessPayment } from '../../core/models/interfaces/success-payment';
+import { HttpService } from '@nestjs/axios';
+import { ConfigService } from '@nestjs/config';
+
 
 @Injectable()
 @Update()
@@ -11,6 +17,7 @@ export class TelegramListener {
   private readonly logoUrl = process.env.TELEGRAM_LOGO_URL;
   public readonly tChannelLink = process.env.TELEGRAM_COMMUNITY_CHANNEL_LINK;
   private readonly appUrl = process.env.APP_URL;
+  private tgWebhookUrl = `${this.appUrl}/api/telegram-webhook-handler`;
 
   private languageBasedText = {
     en: {
@@ -26,6 +33,8 @@ export class TelegramListener {
       policy: '💡 Информация 💡',
     },
   };
+
+  constructor(private readonly httpService: HttpService,) {}
 
   @Start()
   public async start(@Ctx() ctx: Context) {
@@ -68,9 +77,17 @@ export class TelegramListener {
     );
   }
 
-  // @On('successful_payment')
-  // successfulPayment(@Ctx() cxt: Context): Promise<void> {
-  //   const now = Date.now();
-  //   const hash = inchvorFunc(now, cxt.data);
-  // }
+  @On('successful_payment')
+  successfulPayment(@Ctx() ctx: Context): void {
+    const body = (ctx.message as any).successful_payment as SuccessPayment;
+    const dateNow = Date.now();
+    const hash = tgBotMicroValidator(dateNow, body);
+
+    const payload: SecurePayloadDto<SuccessPayment> = {
+      hash,
+      payload: (ctx.message as any).successful_payment,
+      lt: dateNow
+    };
+    this.httpService.post(`${this.tgWebhookUrl}/successful-payment`, payload);
+  }
 }

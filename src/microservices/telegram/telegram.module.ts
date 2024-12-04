@@ -4,6 +4,7 @@ import { ConfigModule } from '@nestjs/config';
 import { TelegrafModule } from 'nestjs-telegraf';
 import { TelegramController } from './telegram.controller';
 import { TelegramListener } from './telegram.listener';
+import { HttpModule } from '@nestjs/axios';
 
 @Module({
   providers: [TelegramRepository, TelegramListener],
@@ -14,6 +15,7 @@ import { TelegramListener } from './telegram.listener';
     TelegrafModule.forRoot({
       token: process.env.TELEGRAM_BOT_KEY,
     }),
+    HttpModule
   ],
   exports: [TelegramRepository, TelegramListener],
   controllers: [TelegramController],

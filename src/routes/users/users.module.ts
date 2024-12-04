@@ -9,12 +9,14 @@ import { AuthService } from '../../shared/services/auth.service';
 import { AuthGuard } from '../../shared/guards/auth.guard';
 import { GlobalServiceModule } from '../../shared/global-service.module';
 import { WalletEntity } from '../../entites/wallet.entity';
+import { ClientsModule } from "../../clients/clients.module";
 
 @Module({
   controllers: [UsersController],
   providers: [UsersService, RefsService, AuthService, AuthGuard],
   imports: [
     GlobalServiceModule,
+    ClientsModule,
     TypeOrmModule.forFeature([UserEntity, RefEntity, WalletEntity]),
   ],
 })

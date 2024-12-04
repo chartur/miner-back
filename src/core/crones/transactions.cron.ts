@@ -1,5 +1,5 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Cron } from '@nestjs/schedule';
+import { Cron, CronExpression } from "@nestjs/schedule";
 import { InjectRepository } from '@nestjs/typeorm';
 import { TransactionEntity } from '../../entites/transaction.entity';
 import { AppTonClient } from '../../shared/services/app-ton-client.service';
@@ -15,7 +15,8 @@ import { WalletService } from '../../routes/wallet/wallet.service';
 import { UserEntity } from '../../entites/user.entity';
 import moment from 'moment';
 import { BoostService } from '../../routes/boost/boost.service';
-import { TelegramService } from '../../shared/services/telegram.service';
+import { TelegramClient } from '../../clients/telegram.client';
+import { MasterInstance } from "pm2-master-process";
 
 @Injectable()
 export class TransactionsCron {
@@ -34,11 +35,12 @@ export class TransactionsCron {
     private settingsService: SettingsService,
     private walletService: WalletService,
     private boostService: BoostService,
-    private telegramService: TelegramService,
+    private telegramClient: TelegramClient,
   ) {}
 
-  @Cron('*/3 * * * *')
-  // @Cron(CronExpression.EVERY_5_SECONDS)
+  // @Cron('*/3 * * * *')
+  @Cron(CronExpression.EVERY_5_SECONDS)
+  @MasterInstance()
   async handleCron(): Promise<void> {
     if (TransactionsCron.isJobRunning) {
       this.logger.log(
@@ -192,7 +194,7 @@ export class TransactionsCron {
               tx,
               this.walletService,
               this.boostService,
-              this.telegramService,
+              this.telegramClient,
             ),
         )
         .filter((tx) => tx.isValid);

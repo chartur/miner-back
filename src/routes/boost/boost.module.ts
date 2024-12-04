@@ -7,6 +7,7 @@ import { UserEntity } from '../../entites/user.entity';
 import { GlobalServiceModule } from '../../shared/global-service.module';
 import { InvoiceEntity } from '../../entites/invoice.entity';
 import { ConfigModule } from '@nestjs/config';
+import { ClientsModule } from '../../clients/clients.module';
 
 @Module({
   controllers: [BoostController],
@@ -14,6 +15,7 @@ import { ConfigModule } from '@nestjs/config';
   imports: [
     GlobalServiceModule,
     ConfigModule,
+    ClientsModule,
     TypeOrmModule.forFeature([BoostEntity, UserEntity, InvoiceEntity]),
   ],
 })

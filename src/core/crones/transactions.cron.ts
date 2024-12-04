@@ -38,8 +38,8 @@ export class TransactionsCron {
     private telegramClient: TelegramClient,
   ) {}
 
-  // @Cron('*/3 * * * *')
-  @Cron(CronExpression.EVERY_5_SECONDS)
+  @Cron('*/3 * * * *')
+  // @Cron(CronExpression.EVERY_5_SECONDS)
   @MasterInstance()
   async handleCron(): Promise<void> {
     if (TransactionsCron.isJobRunning) {

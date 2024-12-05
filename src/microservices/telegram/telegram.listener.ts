@@ -1,13 +1,15 @@
 import { Injectable, Logger } from '@nestjs/common';
-import { Ctx, On, Start, Update } from 'nestjs-telegraf';
-import { Context, Markup } from 'telegraf';
+import { Ctx, InjectBot, On, Start, Update } from 'nestjs-telegraf';
+import { Context, Markup, Telegraf } from 'telegraf';
 import { TelegramHelper } from '../../utils/telegram.helper';
 import { tgBotMicroValidator } from '../../utils/telegram-data-validator';
 import { SecurePayloadDto } from '../../core/models/dto/telegram-microservice/secure-payload.dto';
 import { SuccessPayment } from '../../core/models/interfaces/success-payment';
 import { HttpService } from '@nestjs/axios';
-import { ConfigService } from '@nestjs/config';
-
+import { Message, Update as ContextType } from '@telegraf/types';
+import MessageUpdate = ContextType.MessageUpdate;
+import SuccessfulPaymentMessage = Message.SuccessfulPaymentMessage;
+import { catchError, EMPTY } from 'rxjs';
 
 @Injectable()
 @Update()
@@ -34,7 +36,11 @@ export class TelegramListener {
     },
   };
 
-  constructor(private readonly httpService: HttpService,) {}
+  constructor(
+    private readonly httpService: HttpService,
+    @InjectBot()
+    private readonly bot: Telegraf<Context>,
+  ) {}
 
   @Start()
   public async start(@Ctx() ctx: Context) {
@@ -77,17 +83,31 @@ export class TelegramListener {
     );
   }
 
+  @On('pre_checkout_query')
+  preCheckout(@Ctx() ctx: Context<ContextType.PreCheckoutQueryUpdate>) {
+    this.bot.telegram.answerPreCheckoutQuery(
+      ctx.update.pre_checkout_query.id,
+      true,
+    );
+  }
+
   @On('successful_payment')
-  successfulPayment(@Ctx() ctx: Context): void {
-    const body = (ctx.message as any).successful_payment as SuccessPayment;
+  successfulPayment(
+    @Ctx() ctx: Context<MessageUpdate<SuccessfulPaymentMessage>>,
+  ): void {
+    const body = ctx.update.message.successful_payment;
+    console.log(body);
     const dateNow = Date.now();
     const hash = tgBotMicroValidator(dateNow, body);
 
     const payload: SecurePayloadDto<SuccessPayment> = {
       hash,
-      payload: (ctx.message as any).successful_payment,
-      lt: dateNow
+      payload: body,
+      lt: dateNow,
     };
-    this.httpService.post(`${this.tgWebhookUrl}/successful-payment`, payload);
+    this.httpService
+      .post(`${this.tgWebhookUrl}/successful-payment`, payload)
+      .pipe(catchError(() => EMPTY))
+      .subscribe();
   }
 }

@@ -1,5 +1,4 @@
 import { ConfigModule as GlobalConfigModule } from '@nestjs/config/dist/config.module';
-import { EventEmitterModule } from '@nestjs/event-emitter';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService as GlobalConfigService } from '@nestjs/config/dist/config.service';
 import { ENTITIES } from './entites';
@@ -22,7 +21,6 @@ export const getModules = () => {
     GlobalConfigModule.forRoot({
       envFilePath: `.${process.env.MODE || 'local'}.env`,
     }),
-    EventEmitterModule.forRoot(),
     TypeOrmModule.forRootAsync({
       imports: [GlobalConfigModule],
       useFactory: (config: GlobalConfigService) => {

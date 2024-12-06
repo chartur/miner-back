@@ -7,7 +7,6 @@ import { InvoiceDto } from '../../core/models/dto/response/invoice.dto';
 import { InvoiceEntity } from '../../entites/invoice.entity';
 import { beginCell, toNano } from 'ton';
 import { UserEntity } from '../../entites/user.entity';
-import { AppTonClient } from './app-ton-client.service';
 import { InvoiceAction } from '../../core/models/enums/invoice-action';
 
 @Injectable()
@@ -18,7 +17,6 @@ export class TransactionsService {
     @InjectRepository(InvoiceEntity)
     private invoiceEntityRepository: Repository<InvoiceEntity>,
     private configService: ConfigService,
-    private appTonClient: AppTonClient,
   ) {}
 
   public async createInvoice(

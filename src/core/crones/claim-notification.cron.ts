@@ -4,10 +4,13 @@ import { InjectRepository } from '@nestjs/typeorm';
 import { In, LessThan, Repository } from 'typeorm';
 import { WalletEntity } from '../../entites/wallet.entity';
 import { ConfigService } from '@nestjs/config';
-import moment from 'moment';
-import { TelegramService } from '../../shared/services/telegram.service';
 import { Language } from '../models/enums/language';
 import { Markup } from 'telegraf';
+import { UserSettingsEntity } from '../../entites/user-settings.entity';
+import moment from 'moment';
+import { MasterInstance } from 'pm2-master-process';
+import { TelegramClient } from '../../clients/telegram.client';
+import { TelegramHelper } from '../../utils/telegram.helper';
 
 @Injectable()
 export class ClaimNotificationCron {
@@ -24,35 +27,47 @@ export class ClaimNotificationCron {
   };
 
   constructor(
+    @InjectRepository(UserSettingsEntity)
+    private userSettingsEntityRepository: Repository<UserSettingsEntity>,
     @InjectRepository(WalletEntity)
     private walletEntityRepository: Repository<WalletEntity>,
     private configService: ConfigService,
-    private telegramService: TelegramService,
+    private telegramClient: TelegramClient,
   ) {}
 
   @Cron(CronExpression.EVERY_MINUTE)
+  @MasterInstance()
   public async handleCron(): Promise<void> {
     this.logger.log('[ClaimNotificationCron] Cron started');
     try {
-      const period = this.configService.get<number>('PERIOD_WITH_SECONDS');
-      const wallets = await this.walletEntityRepository.find({
-        where: {
-          lastClaimDateTime: LessThan(
-            moment().subtract(period, 'seconds').toDate(),
-          ),
-          notifiedForClaim: false,
-        },
-        relations: {
-          user: true,
-        },
-      });
+      const period = Number(
+        this.configService.get<number>('PERIOD_WITH_SECONDS'),
+      );
+      const now = moment();
+      const lastClaimDateOffset = now.subtract(period, 'seconds').toDate();
+      const wallets = await this.walletEntityRepository
+        .createQueryBuilder('wallet')
+        .innerJoin('wallet.user', 'user')
+        .innerJoin('user.settings', 'settings')
+        .where(
+          'settings.claimNotificationEnabled = :claimNotificationEnabled',
+          { claimNotificationEnabled: true },
+        )
+        .andWhere('wallet.lastClaimDateTime < :lastClaimDateOffset', {
+          lastClaimDateOffset,
+        })
+        .andWhere('wallet.notifiedForClaim = :notified', {
+          notified: false,
+        })
+        .addSelect(['user', 'wallet', 'settings'])
+        .getMany();
 
       const [enText, ruText] = await Promise.all([
-        await this.telegramService.getTranslationText(
+        await TelegramHelper.getTranslationText(
           Language.EN,
           'claim-notification',
         ),
-        await this.telegramService.getTranslationText(
+        await TelegramHelper.getTranslationText(
           Language.RU,
           'claim-notification',
         ),
@@ -60,14 +75,14 @@ export class ClaimNotificationCron {
 
       Promise.all(
         wallets.map((w) =>
-          this.telegramService.sendMessage({
+          this.telegramClient.sendMessage({
             chatId: w.user.tUserId,
             photoUrl: this.photoUrl,
             text: w.user.languageCode === Language.RU ? ruText : enText,
             buttons: Markup.inlineKeyboard([
               Markup.button.webApp(
                 this.languageBasedText[w.user.languageCode].claim,
-                this.telegramService.getAppUrl().toString(),
+                TelegramHelper.getAppUrl().toString(),
               ),
             ]),
             parseMode: 'HTML',
@@ -81,6 +96,13 @@ export class ClaimNotificationCron {
           id: In(walletIds),
         },
         { notifiedForClaim: true },
+      );
+      await this.userSettingsEntityRepository.update(
+        {
+          claimNotificationEnabled: true,
+          claimNotificationExpiration: LessThan(now.toDate()),
+        },
+        { claimNotificationEnabled: false, claimNotificationExpiration: null },
       );
 
       this.logger.log('[ClaimNotificationCron] Notification sent to claim', {

@@ -12,6 +12,11 @@ import { InvoiceEntity } from '../../entites/invoice.entity';
 import { ConfigService } from '@nestjs/config';
 import { InvoiceAction } from '../../core/models/enums/invoice-action';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
+import { LinkResponseDto } from '../../core/models/dto/response/link.response.dto';
+import { OnEvent } from '@nestjs/event-emitter';
+import { SuccessPayment } from '../../core/models/interfaces/success-payment';
+import { TelegramClient } from '../../clients/telegram.client';
+import { TelegramHelper } from "../../utils/telegram.helper";
 
 @Injectable()
 export class BoostService {
@@ -27,6 +32,7 @@ export class BoostService {
     private boostDetailsService: BoostDetailsService,
     private transactionsService: TransactionsService,
     private configService: ConfigService,
+    private telegramClient: TelegramClient,
   ) {}
 
   public getUserBoost(authUser: UserEntity): Promise<BoostEntity | null> {
@@ -106,6 +112,45 @@ export class BoostService {
     return await this.boostEntityRepository.save(boostDto);
   }
 
+  public async getClaimNotificationActivationInvoice(
+    user: UserEntity,
+  ): Promise<LinkResponseDto> {
+    this.logger.log('[Boost] Claim notification activation invoice creation', {
+      user,
+    });
+    await this.invoiceEntityRepository.delete({
+      user,
+      action: InvoiceAction.CLAIM_NOTIFICATION,
+    });
+    const [title, description] = await Promise.all([
+      TelegramHelper.getTranslationText(
+        user.languageCode,
+        'claim-notifier-title',
+      ),
+      TelegramHelper.getTranslationText(
+        user.languageCode,
+        'claim-notifier-description',
+      ),
+    ]);
+    const amount = Number(
+      this.configService.get<number>('CLAIM_REMINDER_PRICE'),
+    );
+    const invoice = await this.invoiceEntityRepository.save({
+      amount,
+      action: InvoiceAction.CLAIM_NOTIFICATION,
+      details: description,
+      user,
+    });
+    const link = await this.telegramClient.createStarsInvoiceLink(
+      title,
+      invoice,
+    );
+    console.log(link);
+    return {
+      link,
+    };
+  }
+
   public getBoostTypeFromInvoiceAction(
     invoiceAction: InvoiceAction,
   ): BoostLevels {
@@ -127,6 +172,45 @@ export class BoostService {
         return InvoiceAction.BOOST_MAJOR;
       case BoostLevels.MEGA:
         return InvoiceAction.BOOS_MEGA;
+    }
+  }
+
+  @OnEvent('boost.invoice.successful')
+  public async handleOrderCreatedEvent(payload: SuccessPayment): Promise<void> {
+    this.logger.log('[Boost] successful payment', {
+      payload,
+    });
+
+    const invoice = await this.invoiceEntityRepository.findOne({
+      where: {
+        id: payload.invoice_payload,
+      },
+      relations: {
+        user: {
+          wallet: true,
+          settings: true,
+        },
+      },
+    });
+
+    if (!invoice) {
+      this.logger.log('[Boost] successful payment: Invoice not found', {
+        invoiceId: payload.invoice_payload,
+      });
+      return;
+    }
+    const now = moment();
+    switch (invoice.action) {
+      case InvoiceAction.CLAIM_NOTIFICATION:
+        const user = invoice.user;
+        user.settings.claimNotificationEnabled = true;
+        user.settings.claimNotificationExpiration = now
+          .add(1, 'months')
+          .toDate();
+        user.wallet.notifiedForClaim = false;
+        await this.userEntityRepository.save(user);
+        await this.invoiceEntityRepository.remove(invoice);
+        break;
     }
   }
 }

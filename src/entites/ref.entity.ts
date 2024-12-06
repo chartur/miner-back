@@ -22,7 +22,7 @@ export class RefEntity {
     example: '590903',
     description: 'The user who sent link of referral',
   })
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   referrer: UserEntity;
 
   @ApiProperty({
@@ -30,7 +30,7 @@ export class RefEntity {
     example: '590903',
     description: 'The user who joined by sent referral link',
   })
-  @ManyToOne(() => UserEntity, (user) => user.id)
+  @ManyToOne(() => UserEntity, (user) => user.id, { onDelete: 'CASCADE' })
   referral: UserEntity;
 
   @ApiProperty({

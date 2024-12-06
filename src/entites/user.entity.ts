@@ -21,6 +21,7 @@ import {
 } from '../core/decorators/action-date-columns';
 import { Expose } from 'class-transformer';
 import { TaskEntity } from './task.entity';
+import { UserSettingsEntity } from "./user-settings.entity";
 
 @Entity('users')
 export class UserEntity {
@@ -65,6 +66,16 @@ export class UserEntity {
   wallet: WalletEntity;
 
   @ApiProperty({
+    example: UserSettingsEntity,
+    description: 'The wallet of current user',
+  })
+  @OneToOne(() => UserSettingsEntity, (settings) => settings.user, {
+    onDelete: 'CASCADE',
+    cascade: true,
+  })
+  settings: UserSettingsEntity;
+
+  @ApiProperty({
     example: [BoostEntity],
     description: 'The boosts list of current user',
   })
@@ -82,14 +93,14 @@ export class UserEntity {
     example: RefEntity,
     description: 'The user who referred current user',
   })
-  @OneToOne(() => RefEntity, (ref) => ref.referral)
+  @OneToOne(() => RefEntity, (ref) => ref.referral, { onDelete: 'CASCADE' })
   referrer?: RefEntity;
 
   @ApiProperty({
     example: [TransactionEntity],
     description: 'User transactions list',
   })
-  @OneToMany(() => TransactionEntity, (type) => type.user)
+  @OneToMany(() => TransactionEntity, (type) => type.user, { onDelete: 'CASCADE' })
   transactions: TransactionEntity[];
 
   @ApiProperty({

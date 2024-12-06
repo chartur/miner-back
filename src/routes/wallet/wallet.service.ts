@@ -6,7 +6,6 @@ import { DataSource, Repository } from 'typeorm';
 import moment from 'moment';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
 import { BoostEntity } from '../../entites/boost.entity';
-import { TelegramService } from '../../shared/services/telegram.service';
 import { HttpFailureActionTypes } from '../../core/models/enums/http-failure-action-types';
 import { GetCurrencyRateDtoResponse } from '../../core/models/dto/response/get-currency-rate.dto.response';
 import { HttpService } from '@nestjs/axios';
@@ -15,6 +14,7 @@ import { RefEntity } from '../../entites/ref.entity';
 import BigDecimal from 'js-big-decimal';
 import { BoostDetailsService } from '../../shared/services/boost-details.service';
 import { ConfigService } from '@nestjs/config';
+import { TelegramClient } from '../../clients/telegram.client';
 
 @Injectable()
 export class WalletService {
@@ -30,7 +30,7 @@ export class WalletService {
     @InjectRepository(RefEntity)
     private refEntityRepository: Repository<RefEntity>,
     private dataSource: DataSource,
-    private telegramService: TelegramService,
+    private telegramClient: TelegramClient,
     private httpService: HttpService,
     private boostDetailsService: BoostDetailsService,
     private configService: ConfigService,
@@ -62,7 +62,7 @@ export class WalletService {
     );
     if (wallet.claimCount >= unsubscribedClaimCount) {
       const isSubscribed =
-        await this.telegramService.isUserSubscribedToCommunityChannel(
+        await this.telegramClient.isUserSubscribedToCommunityChannel(
           authUser.tUserId,
         );
       if (!isSubscribed) {

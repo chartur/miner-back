@@ -11,6 +11,7 @@ import { HttpModule } from '@nestjs/axios';
 import { RefEntity } from '../../entites/ref.entity';
 import { RefsService } from '../refs/refs.service';
 import { ConfigModule } from '@nestjs/config';
+import { ClientsModule } from "../../clients/clients.module";
 
 @Module({
   controllers: [WalletController],
@@ -26,6 +27,7 @@ import { ConfigModule } from '@nestjs/config';
       UserEntity,
       RefEntity,
     ]),
+    ClientsModule,
   ],
 })
 export class WalletModule {}

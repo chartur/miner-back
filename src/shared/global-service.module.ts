@@ -1,5 +1,4 @@
 import { Module } from '@nestjs/common';
-import { TelegramService } from './services/telegram.service';
 import { HttpModule, HttpService } from '@nestjs/axios';
 import { BoostDetailsService } from './services/boost-details.service';
 import { TypeOrmModule } from '@nestjs/typeorm';
@@ -10,12 +9,11 @@ import { TransactionEntity } from '../entites/transaction.entity';
 import { InvoiceEntity } from '../entites/invoice.entity';
 import { AppTonClient } from './services/app-ton-client.service';
 import { SettingsEntity } from '../entites/settings.entity';
-import { SettingsService } from "./services/settings.service";
+import { SettingsService } from './services/settings.service';
 
 @Module({
   providers: [
     SettingsService,
-    TelegramService,
     BoostDetailsService,
     TransactionsService,
     {
@@ -35,7 +33,6 @@ import { SettingsService } from "./services/settings.service";
     },
   ],
   exports: [
-    TelegramService,
     BoostDetailsService,
     TransactionsService,
     AppTonClient,

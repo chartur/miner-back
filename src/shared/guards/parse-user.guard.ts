@@ -3,6 +3,7 @@ import { Observable } from 'rxjs';
 import { Request } from 'express';
 import { JwtService } from '@nestjs/jwt';
 import { UserEntity } from '../../entites/user.entity';
+import { Context } from "telegraf";
 
 @Injectable()
 export class ParseUserGuard implements CanActivate {
@@ -12,6 +13,9 @@ export class ParseUserGuard implements CanActivate {
     context: ExecutionContext,
   ): boolean | Promise<boolean> | Observable<boolean> {
     const request = context.switchToHttp().getRequest<Request>();
+    if (request instanceof Context) {
+      return true;
+    }
     const bearerToken = request.header('Authorization');
     if (bearerToken) {
       const authToken = bearerToken.split(' ')[1];

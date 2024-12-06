@@ -15,6 +15,8 @@ import { BoostService } from '../../routes/boost/boost.service';
 import { TransactionsCron } from './transactions.cron';
 import { ClaimNotificationCron } from './claim-notification.cron';
 import { InvoicesCron } from './invoices.cron';
+import { UserSettingsEntity } from '../../entites/user-settings.entity';
+import { ClientsModule } from '../../clients/clients.module';
 
 @Module({
   providers: [
@@ -27,8 +29,9 @@ import { InvoicesCron } from './invoices.cron';
   ],
   // providers: [WalletService, ConfigService, BoostService],
   imports: [
-    GlobalServiceModule,
     HttpModule,
+    ClientsModule,
+    GlobalServiceModule,
     TypeOrmModule.forFeature([
       TransactionEntity,
       InvoiceEntity,
@@ -37,6 +40,7 @@ import { InvoicesCron } from './invoices.cron';
       WalletEntity,
       BoostEntity,
       RefEntity,
+      UserSettingsEntity,
     ]),
   ],
 })

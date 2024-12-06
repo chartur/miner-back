@@ -4,13 +4,14 @@ import { SyncUserDto } from '../../core/models/dto/sync-user.dto';
 import { telegramDataValidator } from '../../utils/telegram-data-validator';
 import { InjectRepository } from '@nestjs/typeorm';
 import { Repository } from 'typeorm';
-import { TelegramService } from '../../shared/services/telegram.service';
 import { Language } from '../../core/models/enums/language';
 import { AuthService } from '../../shared/services/auth.service';
 import { AuthUserDto } from '../../core/models/dto/response/auth-user.dto';
 import { DynamicSyncData } from '../../core/models/interfaces/dynamic-sync-data';
 import { RefsService } from '../refs/refs.service';
 import { WalletEntity } from '../../entites/wallet.entity';
+import { UserSettingsEntity } from '../../entites/user-settings.entity';
+import { TelegramClient } from '../../clients/telegram.client';
 
 @Injectable()
 export class UsersService {
@@ -21,7 +22,7 @@ export class UsersService {
     private userEntityRepository: Repository<UserEntity>,
     @InjectRepository(WalletEntity)
     private walletEntityRepository: Repository<WalletEntity>,
-    private telegramService: TelegramService,
+    private telegramClient: TelegramClient,
     private authService: AuthService,
     private refsService: RefsService,
   ) {}
@@ -44,7 +45,7 @@ export class UsersService {
       where: {
         tUserId: user.id.toString(),
       },
-      relations: ['wallet', 'boosts'],
+      relations: ['wallet', 'boosts', 'settings'],
     });
     const newUserData = {
       tUserId: user.id.toString(),
@@ -57,14 +58,24 @@ export class UsersService {
     if (!existingUserData) {
       userEntity = await this.userEntityRepository.save({
         ...newUserData,
+        wallet: new WalletEntity(),
+        settings: new UserSettingsEntity(),
       });
-      await this.walletEntityRepository.save({ user: userEntity });
+      await this.userEntityRepository.save(userEntity);
       if (ref) {
         this.refsService.create(userEntity, ref);
       }
     } else {
+      let needToUpdate = false;
       if (!existingUserData.wallet) {
         existingUserData.wallet = new WalletEntity();
+        needToUpdate = true;
+      }
+      if (!existingUserData.settings) {
+        existingUserData.settings = new UserSettingsEntity();
+        needToUpdate = true;
+      }
+      if (needToUpdate) {
         await this.userEntityRepository.save(existingUserData);
       }
       const isSame = Object.keys(newUserData).every(
@@ -82,7 +93,7 @@ export class UsersService {
     }
 
     // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { wallet, boosts, ...rest } = userEntity;
+    const { wallet, boosts, settings, ...rest } = userEntity;
     const token = await this.authService.signIn(rest);
     return {
       token,
@@ -120,15 +131,13 @@ export class UsersService {
       where: {
         id: authUser.id,
       },
-      relations: ['wallet', 'boosts'],
+      relations: ['wallet', 'boosts', 'settings'],
     });
   }
 
   public async isUserSubscribed(authUser: UserEntity): Promise<boolean> {
-    const isSubscribed =
-      await this.telegramService.isUserSubscribedToCommunityChannel(
-        authUser.tUserId,
-      );
-    return isSubscribed;
+    return this.telegramClient.isUserSubscribedToCommunityChannel(
+      authUser.tUserId,
+    );
   }
 }

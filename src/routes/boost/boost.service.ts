@@ -13,10 +13,9 @@ import { ConfigService } from '@nestjs/config';
 import { InvoiceAction } from '../../core/models/enums/invoice-action';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
 import { LinkResponseDto } from '../../core/models/dto/response/link.response.dto';
-import { OnEvent } from '@nestjs/event-emitter';
 import { SuccessPayment } from '../../core/models/interfaces/success-payment';
 import { TelegramClient } from '../../clients/telegram.client';
-import { TelegramHelper } from "../../utils/telegram.helper";
+import { TelegramHelper } from '../../utils/telegram.helper';
 
 @Injectable()
 export class BoostService {
@@ -175,7 +174,6 @@ export class BoostService {
     }
   }
 
-  @OnEvent('boost.invoice.successful')
   public async handleOrderCreatedEvent(payload: SuccessPayment): Promise<void> {
     this.logger.log('[Boost] successful payment', {
       payload,

@@ -11,6 +11,7 @@ import {
   UpdateDateWithTimezone,
 } from '../core/decorators/action-date-columns';
 import { InvoiceAction } from '../core/models/enums/invoice-action';
+import { InvoicePropsType } from "../core/models/interfaces/invoice-props/invoice-props.type";
 
 @Entity('invoices')
 export class InvoiceEntity {
@@ -51,6 +52,13 @@ export class InvoiceEntity {
   })
   @Column({ nullable: false, type: 'enum', enum: InvoiceAction })
   action: InvoiceAction;
+
+  @ApiProperty({
+    example: '{"taskId": "2142-1412341dfsa-sdafsdf243"}',
+    description: 'The necessary data for invoice handling',
+  })
+  @Column({ nullable: true, type: 'json' })
+  props: InvoicePropsType;
 
   @ApiProperty({
     example: '2011-10-05T14:48:00.000Z',

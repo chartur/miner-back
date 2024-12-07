@@ -5,6 +5,8 @@ import {
   UpdateDateWithTimezone,
 } from '../core/decorators/action-date-columns';
 import { UserEntity } from './user.entity';
+import { TaskAction } from '../core/models/enums/task-action';
+import { TaskDetailsType } from "../core/models/interfaces/task-details/task-details.type";
 
 @Entity('tasks')
 export class TaskEntity {
@@ -43,6 +45,20 @@ export class TaskEntity {
   })
   @Column({ nullable: true })
   icon: string;
+
+  @ApiProperty({
+    example: TaskAction.LINK,
+    description: 'The type of task',
+  })
+  @Column({ type: 'enum', enum: TaskAction, default: TaskAction.LINK })
+  action: TaskAction;
+
+  @ApiProperty({
+    example: '{count: 2}',
+    description: 'The task specific details',
+  })
+  @Column({ type: 'json', nullable: true })
+  details: TaskDetailsType;
 
   @ApiProperty({
     example: [UserEntity],

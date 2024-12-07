@@ -1,0 +1,1 @@
+Task: Pay {{ amount }} Stars to unlock your reward of {{ rewards }} Tib Coins.

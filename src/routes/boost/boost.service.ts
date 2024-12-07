@@ -13,7 +13,6 @@ import { ConfigService } from '@nestjs/config';
 import { InvoiceAction } from '../../core/models/enums/invoice-action';
 import { BoostLevels } from '../../core/models/enums/boost-levels';
 import { LinkResponseDto } from '../../core/models/dto/response/link.response.dto';
-import { SuccessPayment } from '../../core/models/interfaces/success-payment';
 import { TelegramClient } from '../../clients/telegram.client';
 import { TelegramHelper } from '../../utils/telegram.helper';
 
@@ -52,6 +51,10 @@ export class BoostService {
     user: UserEntity,
     body: ActivateBoostDto,
   ): Promise<InvoiceDto> {
+    this.logger.log('[Boost] Create invoice', {
+      user,
+      body,
+    });
     const userInvoicesCount = await this.invoiceEntityRepository.count({
       where: {
         user: {
@@ -144,7 +147,6 @@ export class BoostService {
       title,
       invoice,
     );
-    console.log(link);
     return {
       link,
     };
@@ -174,41 +176,19 @@ export class BoostService {
     }
   }
 
-  public async handleOrderCreatedEvent(payload: SuccessPayment): Promise<void> {
+  public async claimNotificationPaymentSuccess(
+    invoice: InvoiceEntity,
+  ): Promise<void> {
     this.logger.log('[Boost] successful payment', {
-      payload,
+      invoice,
     });
 
-    const invoice = await this.invoiceEntityRepository.findOne({
-      where: {
-        id: payload.invoice_payload,
-      },
-      relations: {
-        user: {
-          wallet: true,
-          settings: true,
-        },
-      },
-    });
-
-    if (!invoice) {
-      this.logger.log('[Boost] successful payment: Invoice not found', {
-        invoiceId: payload.invoice_payload,
-      });
-      return;
-    }
     const now = moment();
-    switch (invoice.action) {
-      case InvoiceAction.CLAIM_NOTIFICATION:
-        const user = invoice.user;
-        user.settings.claimNotificationEnabled = true;
-        user.settings.claimNotificationExpiration = now
-          .add(10, 'days')
-          .toDate();
-        user.wallet.notifiedForClaim = false;
-        await this.userEntityRepository.save(user);
-        await this.invoiceEntityRepository.remove(invoice);
-        break;
-    }
+    const user = invoice.user;
+    user.settings.claimNotificationEnabled = true;
+    user.settings.claimNotificationExpiration = now.add(10, 'days').toDate();
+    user.wallet.notifiedForClaim = false;
+    await this.userEntityRepository.save(user);
+    await this.invoiceEntityRepository.remove(invoice);
   }
 }

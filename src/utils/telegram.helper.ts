@@ -11,11 +11,19 @@ export class TelegramHelper {
   public static getTranslationText(
     lang: Language,
     file: string,
+    replacement?: Record<string, string>,
   ): Promise<string> {
     return readFile(
       join(__dirname, '..', 'assets', 'telegram-assets', lang, `${file}.txt`),
       'utf-8',
-    );
+    ).then((text) => {
+      if (replacement) {
+        Object.entries(replacement).forEach(([key, value]) => {
+          text = text.replace(`{{ ${key} }}`, value);
+        });
+      }
+      return text;
+    });
   }
 
   public static getProperLanguage(userLang: string): Language {

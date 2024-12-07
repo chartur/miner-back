@@ -11,6 +11,9 @@ import { ConfigModule } from '@nestjs/config';
 import { ClientsModule } from '../../clients/clients.module';
 import { BoostDetails } from '../../entites/boost-details';
 import { TransactionEntity } from '../../entites/transaction.entity';
+import { TaskEntity } from '../../entites/task.entity';
+import { TelegramWebhookService } from './telegram-webhook.service';
+import { TaskService } from "../task/task.service";
 
 @Module({
   imports: [
@@ -20,11 +23,18 @@ import { TransactionEntity } from '../../entites/transaction.entity';
       InvoiceEntity,
       BoostDetails,
       TransactionEntity,
+      TaskEntity,
     ]),
     ConfigModule,
     ClientsModule,
   ],
   controllers: [TelegramWebhookController],
-  providers: [BoostService, BoostDetailsService, TransactionsService],
+  providers: [
+    TelegramWebhookService,
+    BoostService,
+    BoostDetailsService,
+    TransactionsService,
+    TaskService,
+  ],
 })
 export class TelegramWebhookModule {}

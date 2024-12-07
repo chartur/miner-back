@@ -159,15 +159,6 @@ export class TaskService {
   public async dailyStarInvoiceTaskComplete(
     invoice: InvoiceEntity,
   ): Promise<void> {
-    const user = invoice.user;
-    const props = invoice.props as TaskCompleteProps;
-    const task = await this.taskEntityRepository.findOne({
-      where: {
-        id: props.taskId,
-      },
-    });
-    user.wallet.tibCoins += task.profit;
-    await this.userEntityRepository.save(user);
     await this.invoiceEntityRepository.remove(invoice);
   }
 }

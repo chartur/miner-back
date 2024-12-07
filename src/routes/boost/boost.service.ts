@@ -203,7 +203,7 @@ export class BoostService {
         const user = invoice.user;
         user.settings.claimNotificationEnabled = true;
         user.settings.claimNotificationExpiration = now
-          .add(1, 'months')
+          .add(10, 'days')
           .toDate();
         user.wallet.notifiedForClaim = false;
         await this.userEntityRepository.save(user);

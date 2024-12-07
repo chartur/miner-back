@@ -18,6 +18,7 @@ export class TelegramListener {
 
   private readonly logoUrl = process.env.TELEGRAM_LOGO_URL;
   public readonly tChannelLink = process.env.TELEGRAM_COMMUNITY_CHANNEL_LINK;
+  public readonly tPolicyLink = process.env.TELEGRAM_PRIVACY_POLICY_LINK;
   private readonly appUrl = process.env.APP_URL;
   private tgWebhookUrl = `${this.appUrl}/api/telegram-webhook-handler`;
 
@@ -62,7 +63,7 @@ export class TelegramListener {
         ),
         Markup.button.url(
           this.languageBasedText[lang].policy,
-          this.tChannelLink,
+          this.tPolicyLink,
         ),
       ],
       {

@@ -11,7 +11,7 @@ import { AdminModule } from './routes/admin/admin.module';
 import { ApiModule } from './routes/api/api.module';
 import { RouterModule } from '@nestjs/core';
 import { routes } from './app-routes';
-import { appPath } from './app.config';
+import { appPath, assetsPath } from './app.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 import { join } from 'path';
 
@@ -47,7 +47,7 @@ export const getModules = async (): Promise<any> => {
       signOptions: { expiresIn: '6h' },
     }),
     ServeStaticModule.forRoot({
-      rootPath: join(__dirname, '..', 'assets'), // Change the path based on your actual assets folder
+      rootPath: assetsPath, // Change the path based on your actual assets folder
       serveRoot: '/public', // This will make assets accessible at /assets/...
     }),
     ServeStaticModule.forRoot({

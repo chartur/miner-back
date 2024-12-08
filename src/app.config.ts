@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-export const appVersion = '2.4.1';
+export const appVersion = '2.4.2';
 
 export const appPath =
   process.env.MODE === 'local'
@@ -11,3 +11,8 @@ export const viewPath =
   process.env.MODE === 'local'
     ? join(__dirname, '..', 'views')
     : join(__dirname, 'views');
+
+export const assetsPath =
+  process.env.MODE === 'local'
+    ? join(__dirname, '..', 'assets')
+    : join(__dirname, 'assets');

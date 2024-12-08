@@ -9,7 +9,7 @@ export class AppModule {
   static async register(): Promise<DynamicModule> {
     return {
       module: AppModule,
-      imports: await getModules(),
+      imports: getModules(),
       providers: [JwtService, ParseUserGuard],
     };
   }

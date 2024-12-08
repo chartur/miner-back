@@ -47,12 +47,13 @@ export const getModules = async (): Promise<any> => {
       signOptions: { expiresIn: '6h' },
     }),
     ServeStaticModule.forRoot({
-      rootPath: assetsPath, // Change the path based on your actual assets folder
-      serveRoot: '/public', // This will make assets accessible at /assets/...
+      rootPath: assetsPath,
+      serveRoot: '/public',
+      exclude: ['/api/*', '/admin/*', '/favicon.ico'],
     }),
     ServeStaticModule.forRoot({
       rootPath: appPath,
-      exclude: ['api*', 'admin*', 'public*'],
+      exclude: ['/api/*', '/admin/*', '/public/*', 'favicon.ico'],
     }),
     ScheduleModule.forRoot(),
     GlobalServiceModule,

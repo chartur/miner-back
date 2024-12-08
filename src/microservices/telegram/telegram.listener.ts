@@ -97,7 +97,6 @@ export class TelegramListener {
     @Ctx() ctx: Context<MessageUpdate<SuccessfulPaymentMessage>>,
   ): void {
     const body = ctx.update.message.successful_payment;
-    console.log(body);
     const dateNow = Date.now();
     const hash = tgBotMicroValidator(dateNow, body);
 

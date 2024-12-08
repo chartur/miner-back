@@ -8,6 +8,7 @@ import { InvoiceEntity } from './invoice.entity';
 import { SettingsEntity } from './settings.entity';
 import { TaskEntity } from './task.entity';
 import { UserSettingsEntity } from './user-settings.entity';
+import { AdminEntity } from "./admin.entity";
 
 export const ENTITIES = [
   UserEntity,
@@ -20,4 +21,5 @@ export const ENTITIES = [
   SettingsEntity,
   TaskEntity,
   UserSettingsEntity,
+  AdminEntity,
 ];

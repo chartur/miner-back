@@ -1,0 +1,38 @@
+{% extends "../layouts/admin-layout.html" %}
+
+{% block content %}
+  <h1>Users List</h1>
+  <div class="table-responsive">
+    <table class="table table-striped">
+      <thead>
+        <tr>
+          <th>ID</th>
+          <th>TgID</th>
+          <th>FName</th>
+          <th>LName</th>
+          <th>Photo</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+        {% for user in users %}
+          <tr>
+            <td>{{ user.id }}</td>
+            <td>{{ user.tUserId }}</td>
+            <td>{{ user.firstName }}</td>
+            <td>{{ user.lastName }}</td>
+            <td>
+              <img width="40px" src="{{ user.photoUrl }}">
+            </td>
+            <td>
+              <a href="/admin/users/{{ user.id }}" class="btn btn-sm btn-warning">
+                <i class="bi bi-eye"></i>
+                View
+              </a>
+            </td>
+          </tr>
+        {% endfor %}
+      </tbody>
+    </table>
+  </div>
+{% endblock %}

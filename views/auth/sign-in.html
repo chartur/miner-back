@@ -1,6 +1,42 @@
-{% extends "../layouts/admin-layout.html" %}
+{% extends "../layouts/auth-layout.html" %}
 
 {% block content %}
-  <h1 class="h3">Welcome to the Admin Panel {{ test }}</h1>
-  <p>This is your dashboard. You can manage users, settings, and more.</p>
+  {% if _session.errors %}
+    <div class="alert alert-danger mt-3">
+      {% for error in _session.errors %}
+        <p class="mb-0">{{ error }}</p>
+      {% endfor %}
+    </div>
+  {% endif %}
+  <div class="row">
+    <div class="col-lg-4 offset-lg-4 col-12">
+      <div class="card mt-5">
+        <form action="/admin/auth/sign-in" method="post">
+          <div class="card-header">
+            Sign In
+          </div>
+          <div class="card-body">
+            <div class="mb-3">
+              <label for="exampleInputEmail1" class="form-label">Email address</label>
+              <input
+                type="email"
+                class="form-control"
+                name="email"
+                id="exampleInputEmail1"
+                aria-describedby="emailHelp"
+                value="{{ _session.oldValues.email }}"
+              >
+            </div>
+            <div class="mb-3">
+              <label for="exampleInputPassword1" class="form-label">Password</label>
+              <input type="password" name="password" class="form-control" id="exampleInputPassword1">
+            </div>
+          </div>
+          <div class="card-footer">
+            <button type="submit" class="btn btn-primary">Submit</button>
+          </div>
+        </form>
+      </div>
+    </div>
+  </div>
 {% endblock %}

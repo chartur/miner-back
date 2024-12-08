@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Simple Admin Panel</title>
+  <!-- Bootstrap 5 CSS -->
+  <link href="/public/css/bootstrap.min.css" rel="stylesheet">
+  <link href="/public/css/main.css" rel="stylesheet">
+</head>
+<body>
+
+<!-- Wrapper for the entire page -->
+<div class="d-flex" id="wrapper">
+
+  <!-- Sidebar -->
+  <div class="bg-dark text-white" id="sidebar" style="width: 250px; height: 100vh;">
+    <div class="sidebar-header py-3 text-center">
+      <h4>Admin Panel</h4>
+    </div>
+    <div class="list-group">
+      <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
+      <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Users</a>
+      <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Settings</a>
+      <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Logout</a>
+    </div>
+  </div>
+
+  <!-- Page Content -->
+  <div id="page-content-wrapper" class="w-100">
+
+    <!-- Header -->
+    <nav class="navbar navbar-expand-lg navbar-light bg-light shadow-sm">
+      <div class="container-fluid">
+        <button class="btn btn-primary" id="menu-toggle">Toggle Sidebar</button>
+        <span class="navbar-text ms-auto">
+            Admin Name
+        </span>
+      </div>
+    </nav>
+
+    <div class="container-fluid py-4">
+      {% block content %}{% endblock %}
+    </div>
+
+    <footer class="bg-light text-center py-3 mt-auto">
+      <p>&copy; 2024 Your Company Name. All Rights Reserved.</p>
+    </footer>
+
+  </div>
+</div>
+
+<script src="/public/js/popper.js"></script>
+<script src="/public/js/bootstrap.min.js"></script>
+
+<!-- Optional JS for toggling sidebar -->
+<script>
+  const toggleButton = document.getElementById('menu-toggle');
+  const sidebar = document.getElementById('sidebar');
+
+  toggleButton.addEventListener('click', () => {
+    sidebar.classList.toggle('d-none');
+  });
+</script>
+
+</body>
+</html>

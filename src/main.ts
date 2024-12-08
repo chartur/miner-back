@@ -5,6 +5,7 @@ import { ParseUserGuard } from './shared/guards/parse-user.guard';
 import { NestExpressApplication } from '@nestjs/platform-express';
 import { join } from 'path';
 import * as nunjucks from 'nunjucks';
+import { viewPath } from "./app.config";
 
 declare global {
   interface BigInt {
@@ -27,11 +28,11 @@ async function bootstrap() {
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 
   app.setViewEngine('nunjucks');
-  nunjucks.configure(join(__dirname, '..', 'views'), {
+  nunjucks.configure(viewPath, {
     express: app,
     autoescape: true,
     watch: true,
-    noCache: process.env.NODE_ENV === 'development',
+    noCache: process.env.NODE_ENV === 'local',
   });
 
   await app.listen(process.env.PORT || 9000);

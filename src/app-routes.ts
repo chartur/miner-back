@@ -51,9 +51,5 @@ export const routes: Routes = [
         module: BoostModule,
       },
     ],
-  },
-  {
-    path: 'admin',
-    module: AdminModule,
-  },
+  }
 ];

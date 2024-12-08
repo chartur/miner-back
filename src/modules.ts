@@ -13,11 +13,9 @@ import { RouterModule } from '@nestjs/core';
 import { routes } from './app-routes';
 import { appPath, assetsPath } from './app.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
-import { join } from 'path';
 
 export const getModules = async (): Promise<any> => {
   const modules = [
-    RouterModule.register(routes),
     GlobalConfigModule.forRoot({
       envFilePath: `.${process.env.MODE || 'local'}.env`,
     }),
@@ -65,7 +63,17 @@ export const getModules = async (): Promise<any> => {
   }
 
   if (await isMasterProcess()) {
-    modules.push(AdminModule);
+    modules.push(
+      AdminModule,
+      RouterModule.register([
+        {
+          path: 'admin',
+          module: AdminModule,
+        },
+      ]),
+    );
+  } else {
+    modules.push(RouterModule.register(routes));
   }
 
   return modules;

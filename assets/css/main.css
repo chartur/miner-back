@@ -1,0 +1,8 @@
+#page-content-wrapper {
+    display: flex;
+    flex-direction: column;
+    height: 100vh;
+}
+.container-fluid {
+    flex-grow: 1;
+}

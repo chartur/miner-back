@@ -1,0 +1,1 @@
+Complete today's task and earn {{ rewards }} Tib Coins! ✨

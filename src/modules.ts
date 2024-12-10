@@ -3,21 +3,18 @@ import { TypeOrmModule } from '@nestjs/typeorm';
 import { ConfigService as GlobalConfigService } from '@nestjs/config/dist/config.service';
 import { ENTITIES } from './entites';
 import { JwtModule } from '@nestjs/jwt';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { appPath } from './app.config';
 import { ScheduleModule } from '@nestjs/schedule';
-import { UsersModule } from './routes/users/users.module';
-import { RefsModule } from './routes/refs/refs.module';
-import { WalletModule } from './routes/wallet/wallet.module';
-import { BoostModule } from './routes/boost/boost.module';
-import { ConfigModule } from './routes/config/config.module';
-import { TaskModule } from './routes/task/task.module';
 import { GlobalServiceModule } from './shared/global-service.module';
-import { TelegramWebhookModule } from './routes/telegram-webhook/telegram-webhook.module';
 import { CronesModule } from './core/crones/crons.module';
+import { ApiModule } from './routes/api/api.module';
+import { RouterModule } from '@nestjs/core';
+import { routes } from './app-routes';
+import { appPath } from './app.config';
+import { ServeStaticModule } from '@nestjs/serve-static';
 
 export const getModules = () => {
   const modules = [
+    RouterModule.register(routes),
     GlobalConfigModule.forRoot({
       envFilePath: `.${process.env.MODE || 'local'}.env`,
     }),
@@ -48,17 +45,11 @@ export const getModules = () => {
     }),
     ServeStaticModule.forRoot({
       rootPath: appPath,
-      exclude: ['/api*'],
+      exclude: ['/api/*'],
     }),
     ScheduleModule.forRoot(),
-    UsersModule,
-    RefsModule,
-    WalletModule,
-    BoostModule,
-    ConfigModule,
-    TaskModule,
     GlobalServiceModule,
-    TelegramWebhookModule,
+    ApiModule,
   ];
 
   if (JSON.parse(process.env.RUN_CRON)) {

@@ -11,10 +11,10 @@ import { ParsedTransaction } from '../models/classes/parsed-transaction';
 import { GetTransactionsDto } from '../models/interfaces/get-transaction-dto';
 import { SettingsService } from '../../shared/services/settings.service';
 import { InvoiceEntity } from '../../entites/invoice.entity';
-import { WalletService } from '../../routes/wallet/wallet.service';
+import { WalletService } from '../../routes/api/wallet/wallet.service';
 import { UserEntity } from '../../entites/user.entity';
 import moment from 'moment';
-import { BoostService } from '../../routes/boost/boost.service';
+import { BoostService } from '../../routes/api/boost/boost.service';
 import { TelegramClient } from '../../clients/telegram.client';
 import { MasterInstance } from "pm2-master-process";
 

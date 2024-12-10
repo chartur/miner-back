@@ -2,6 +2,7 @@ import { NestFactory, Reflector } from '@nestjs/core';
 import { AppModule } from './app.module';
 import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import { ParseUserGuard } from './shared/guards/parse-user.guard';
+import { NestExpressApplication } from '@nestjs/platform-express';
 
 declare global {
   interface BigInt {
@@ -14,11 +15,12 @@ BigInt.prototype.toJSON = function () {
 };
 
 async function bootstrap() {
-  const app = await NestFactory.create(AppModule);
+  const app = await NestFactory.create<NestExpressApplication>(
+    await AppModule.register(),
+  );
 
   app.useGlobalGuards(app.get(ParseUserGuard));
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
-  app.setGlobalPrefix('api');
   app.enableCors();
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
 

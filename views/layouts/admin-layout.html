@@ -17,15 +17,19 @@
 <div class="d-flex" id="wrapper">
 
   <!-- Sidebar -->
-  <div class="bg-dark text-white" id="sidebar" style="width: 250px; height: 100vh;">
-    <div class="sidebar-header py-3 text-center">
-      <h4>Admin Panel</h4>
+  <div class="bg-dark" id="sidebar">
+    <div>
+      <div class="sidebar-header py-3 text-center">
+        <h4>Admin Panel</h4>
+      </div>
+      <div class="list-group">
+        <a href="/dashboard" style="border: none" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
+        <a href="/users/list" style="border: none" class="list-group-item list-group-item-action bg-dark text-white">Users</a>
+        <a href="#" style="border: none" class="list-group-item list-group-item-action bg-dark text-white">Settings</a>
+      </div>
     </div>
     <div class="list-group">
-      <a href="/dashboard" class="list-group-item list-group-item-action bg-dark text-white">Dashboard</a>
-      <a href="/users/list" class="list-group-item list-group-item-action bg-dark text-white">Users</a>
-      <a href="#" class="list-group-item list-group-item-action bg-dark text-white">Settings</a>
-      <a href="/sign-out" class="list-group-item list-group-item-action bg-dark text-white">Logout</a>
+      <a href="/sign-out" style="border: none" class="list-group-item list-group-item-action bg-dark text-white">Logout</a>
     </div>
   </div>
 
@@ -55,7 +59,7 @@
     </div>
 
     <footer class="bg-light text-center py-3 mt-auto">
-      <p>&copy; 2024 Your Company Name. All Rights Reserved.</p>
+      <p>&copy; 2024 TibTonic organization. All Rights Reserved.</p>
     </footer>
 
   </div>

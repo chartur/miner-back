@@ -54,13 +54,13 @@ export class UsersController {
       where: {
         id: userId,
       },
+      relations: ['wallet', 'completedTasks']
     });
     if (!user) {
       createSessionError(req, ['User does not exits']);
       res.redirect(req.get('Referrer'));
       return;
     }
-
     return {
       user,
     };

@@ -1,5 +1,81 @@
-{% extends "../layouts/admin-layout.html" %}
+{% extends "layouts/admin-layout.html" %}
 
 {% block content %}
-  <h1>{{ user.firstName }} {{ user.lastName }}</h1>
+<div class="container mt-5">
+  <!-- User Info Section -->
+
+  <div class="accordion" id="accordionPanelsStayOpenExample">
+    <div class="accordion-item">
+        <h2 class="accordion-header" id="headingOne">
+          <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseOne" aria-expanded="true" aria-controls="collapseOne">
+            User Info
+          </button>
+        </h2>
+        <div id="collapseOne" class="accordion-collapse collapse show" aria-labelledby="headingOne" data-bs-parent="#accordionExample">
+          <div class="accordion-body">
+            <div class="card mb-4">
+              <div class="card-body">
+                <p><strong>TID:</strong> {{ user.tUserId }}</p>
+                <p><strong>Name:</strong> {{ user.firstName }} {{ user.lastName }}</p>
+                <p><strong>Photo:</strong> <img class="rounded-3" width="90" src="{{ user.photoUrl }}" alt=""></p>
+                <p><strong>Joined:</strong> {{ user.createdAt }}</p>
+              </div>
+            </div>
+          </div>
+        </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingTwo">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseTwo" aria-expanded="true" aria-controls="collapseTwo">
+          User wallet Info
+        </button>
+      </h2>
+      <div id="collapseTwo" class="accordion-collapse collapse show" aria-labelledby="headingTwo" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <div class="card mb-4">
+            <div class="card-body">
+              <p><strong>Ton balance:</strong> {{ user.wallet.tons }}</p>
+              <p><strong>Tib coin balance:</strong> {{ user.wallet.tibCoins }}</p>
+              <p><strong>Enable claim notification:</strong> {{ user.wallet.notifiedForClaim }}</p>
+              <button class="btn btn-secondary">View Transactions</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="accordion-item">
+      <h2 class="accordion-header" id="headingThree">
+        <button class="accordion-button" type="button" data-bs-toggle="collapse" data-bs-target="#collapseThree" aria-expanded="true" aria-controls="collapseThree">
+          User tasks
+        </button>
+      </h2>
+      <div id="collapseThree" class="accordion-collapse collapse show" aria-labelledby="headingThree" data-bs-parent="#accordionExample">
+        <div class="accordion-body">
+          <div class="card">
+            <div class="card-body">
+              <!-- Not Completed Tasks -->
+
+              <!-- Completed Tasks -->
+              <h5 class="mb-3">Completed Tasks</h5>
+              <ul class="list-group">
+                {% for task in user.completedTasks %}
+                <li class="list-group-item text-decoration-line-through text-muted">{{ task.title }}</li>
+                {% else %}
+                <li class="list-group-item text-decoration-line-through text-muted">Task nema</li>
+                {% endfor %}
+              </ul>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+</div>
+<!--  <div class="w-100 d-flex">-->
+<!--    <h1>{{ user.firstName }} {{ user.lastName }}</h1>-->
+<!--    <img width="90" src="{{ user.photoUrl }}" alt="">-->
+<!--  </div>-->
 {% endblock %}

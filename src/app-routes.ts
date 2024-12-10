@@ -1,5 +1,4 @@
 import { Routes } from '@nestjs/core';
-import { AdminModule } from './routes/admin/admin.module';
 import { ApiModule } from './routes/api/api.module';
 import { WalletModule } from './routes/api/wallet/wallet.module';
 import { UsersModule } from './routes/api/users/users.module';
@@ -51,9 +50,5 @@ export const routes: Routes = [
         module: BoostModule,
       },
     ],
-  },
-  {
-    path: 'admin',
-    module: AdminModule,
   },
 ];

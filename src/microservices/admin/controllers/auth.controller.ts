@@ -7,17 +7,22 @@ import { AdminEntity } from '../../../entites/admin.entity';
 import { Repository } from 'typeorm';
 import { createSessionError } from '../../../utils/create-session-error';
 
-@Controller('auth')
+@Controller()
 export class AuthController {
   constructor(
     @InjectRepository(AdminEntity)
     private readonly adminEntityRepository: Repository<AdminEntity>,
   ) {}
 
+  @Get('')
+  indexPage(@Res() res: Response) {
+    res.redirect('/sign-in');
+  }
+
   @Get('sign-in')
   signInPage(@Req() req: Request, @Res() res: Response) {
     if (req.session['admin']) {
-      res.redirect('/admin/dashboard');
+      res.redirect('/dashboard');
       return;
     }
     res.render('auth/sign-in.html');
@@ -29,6 +34,7 @@ export class AuthController {
     @Req() req: Request,
     @Res() res: Response,
   ) {
+    console.log(body);
     const admin = await this.adminEntityRepository.findOne({
       where: { email: body.email },
     });
@@ -40,13 +46,13 @@ export class AuthController {
     if (admin && (await bcrypt.compare(body.password, admin.password))) {
       req.session['admin'] = admin;
     }
-    res.redirect('/admin/dashboard');
+    res.redirect('/dashboard');
   }
 
   @Get('sign-out')
   async logOut(@Req() req: Request, @Res() res: Response) {
     delete req.session['admin'];
     req.session.save();
-    res.redirect('/admin/auth/sign-in');
+    res.redirect('/sign-in');
   }
 }

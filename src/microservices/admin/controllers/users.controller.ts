@@ -1,7 +1,10 @@
 import {
   Controller,
+  DefaultValuePipe,
   Get,
   Param,
+  ParseIntPipe,
+  Query,
   Render,
   Req,
   Res,
@@ -12,6 +15,7 @@ import { UserEntity } from '../../../entites/user.entity';
 import { Repository } from 'typeorm';
 import { createSessionError } from '../../../utils/create-session-error';
 import { Request, Response } from 'express';
+import { paginate, Pagination } from 'nestjs-typeorm-paginate';
 import { AdminGuard } from '../../../shared/guards/admin.guard';
 
 @Controller('users')
@@ -24,9 +28,18 @@ export class UsersController {
 
   @Get('list')
   @Render('users/list.html')
-  async listPage() {
+  async listPage(
+    @Query('page', new DefaultValuePipe(1), ParseIntPipe) page: number = 1,
+    @Query('limit', new DefaultValuePipe(10), ParseIntPipe) limit: number = 10,
+  ): Promise<{ users: Pagination<UserEntity> }> {
+    const repo = await this.userEntityRepository.createQueryBuilder();
+    const data = await paginate(repo, {
+      limit,
+      page,
+      route: '/users/list',
+    });
     return {
-      users: await this.userEntityRepository.find({}),
+      users: data,
     };
   }
 

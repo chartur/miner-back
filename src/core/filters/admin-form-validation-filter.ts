@@ -17,7 +17,7 @@ export class ValidationExceptionFilter implements ExceptionFilter {
 
     if (exception instanceof ForbiddenException) {
       createSessionError(request, ['You are not signed-in']);
-      response.redirect('/admin/auth/sign-in');
+      response.redirect('/sign-in');
       return;
     }
 

@@ -6,11 +6,10 @@ import { JwtModule } from '@nestjs/jwt';
 import { ScheduleModule } from '@nestjs/schedule';
 import { GlobalServiceModule } from './shared/global-service.module';
 import { CronesModule } from './core/crones/crons.module';
-import { AdminModule } from './routes/admin/admin.module';
 import { ApiModule } from './routes/api/api.module';
 import { RouterModule } from '@nestjs/core';
 import { routes } from './app-routes';
-import { appPath, assetsPath } from './app.config';
+import { appPath } from './app.config';
 import { ServeStaticModule } from '@nestjs/serve-static';
 
 export const getModules = () => {
@@ -45,18 +44,12 @@ export const getModules = () => {
       signOptions: { expiresIn: '6h' },
     }),
     ServeStaticModule.forRoot({
-      rootPath: assetsPath,
-      serveRoot: '/public',
-      exclude: ['/api/*', '/admin/*', '/favicon.ico'],
-    }),
-    ServeStaticModule.forRoot({
       rootPath: appPath,
-      exclude: ['/api/*', '/admin/*', '/public/*', 'favicon.ico'],
+      exclude: ['/api/*'],
     }),
     ScheduleModule.forRoot(),
     GlobalServiceModule,
     ApiModule,
-    AdminModule,
   ];
 
   if (JSON.parse(process.env.RUN_CRON)) {

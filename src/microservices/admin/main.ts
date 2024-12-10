@@ -5,14 +5,14 @@ import { ClassSerializerInterceptor, ValidationPipe } from '@nestjs/common';
 import * as nunjucks from 'nunjucks';
 import { AdminModule } from './admin.module';
 import { NextFunction, Request, Response } from 'express';
-import { join } from 'path';
+import { assetsPath, viewPath } from '../../app.config';
 
 async function bootstrap() {
   const app = await NestFactory.create<NestExpressApplication>(AdminModule);
 
   app.useGlobalInterceptors(new ClassSerializerInterceptor(app.get(Reflector)));
   app.useGlobalPipes(new ValidationPipe({ transform: true }));
-  app.useStaticAssets(join(__dirname, 'assets'), {
+  app.useStaticAssets(assetsPath, {
     prefix: '/assets',
   });
   app.enableCors();
@@ -25,7 +25,7 @@ async function bootstrap() {
     }),
   );
   app.setViewEngine('nunjucks');
-  const nEnv = nunjucks.configure(join(__dirname, 'views'), {
+  const nEnv = nunjucks.configure(viewPath, {
     express: app,
     autoescape: true,
     watch: true,

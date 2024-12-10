@@ -5,13 +5,9 @@ import { ValidationExceptionFilter } from '../../core/filters/admin-form-validat
 import { APP_FILTER } from '@nestjs/core';
 import { TypeOrmModule } from '@nestjs/typeorm';
 import { UsersController } from './controllers/users.controller';
-import { ServeStaticModule } from '@nestjs/serve-static';
-import { assetsPath } from '../../app.config';
 import { ConfigModule as GlobalConfigModule } from '@nestjs/config/dist/config.module';
 import { ConfigService as GlobalConfigService } from '@nestjs/config/dist/config.service';
 import { ENTITIES } from '../../entites';
-
-console.log(assetsPath);
 
 @Module({
   controllers: [AuthController, DashboardController, UsersController],

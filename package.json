@@ -12,7 +12,7 @@
     "build:watch": "nest build --watch",
     "start:api": "MODE=local nodemon build/main.js",
     "start:bot": "MODE=local nodemon build/microservices/telegram/main.js",
-    "start:admin": "MODE=local nodemon build/microservices/admin/main.js",
+    "start:admin": "MODE=prod nodemon build/microservices/admin/main.js",
     "start:all": "concurrently \"npm run build:watch\" \"npm run start:api\" \"npm run start:bot\" \"npm run start:admin\"",
     "start": "nest start",
     "start:dev": "MODE=local nest start --watch",

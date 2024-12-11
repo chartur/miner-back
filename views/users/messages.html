@@ -1,0 +1,50 @@
+{% extends "layouts/admin-layout.html" %}
+{% block content %}
+<div class="container mt-5">
+  <h1 class="mb-4">Send Message to Multiple Users</h1>
+  <form class="row">
+    <!-- Select Users -->
+    <div id="choices" class="choices" data-type="select-multiple" role="combobox" aria-autocomplete="list" aria-haspopup="true" aria-expanded="false"><div class="choices__inner"><select class="form-control choices__input" name="reset-multiple" id="reset-multiple" multiple="" hidden="" tabindex="-1" data-choice="active">
+      <option value="Choice 1" selected="">Choice 1</option>
+      <option value="Choice 2">Choice 2</option>
+      <option value="Choice 3" selected="">Choice 3</option>
+      <option value="Choice 4" disabled="">Choice 4</option>
+    </select>
+    <div class="choices__list choices__list--multiple" role="listbox"><div class="choices__item choices__item--selectable" data-item="" data-id="1" data-value="Choice 1" aria-selected="true" role="option" data-deletable="">Choice 1<button type="button" class="choices__button" aria-label="Remove item: Choice 1" data-button="">Remove item</button></div><div class="choices__item choices__item--selectable" data-item="" data-id="3" data-value="Choice 3" aria-selected="true" role="option" data-deletable="">Choice 3<button type="button" class="choices__button" aria-label="Remove item: Choice 3" data-button="">Remove item</button></div></div><input type="search" class="choices__input choices__input--cloned" autocomplete="off" autocapitalize="off" spellcheck="false" role="textbox" aria-autocomplete="list" aria-label="And me!" style="min-width: 1ch; width: 1ch;" aria-activedescendant="choices--reset-multiple-item-choice-4"></div><div class="choices__list choices__list--dropdown" aria-expanded="false"><div class="choices__list" aria-multiselectable="true" role="listbox"><div id="choices--reset-multiple-item-choice-2" class="choices__item choices__item--choice choices__item--selectable" role="option" data-choice="" data-id="2" data-value="Choice 2" data-select-text="Press to select" data-choice-selectable="" aria-selected="false">Choice 2</div><div id="choices--reset-multiple-item-choice-4" class="choices__item choices__item--choice choices__item--disabled is-highlighted" role="option" data-choice="" data-id="4" data-value="Choice 4" data-select-text="Press to select" data-choice-disabled="" aria-disabled="true" aria-selected="true">Choice 4</div></div></div></div>
+
+    <!-- Message Text Area -->
+    <div class="col-12 mb-3">
+      <label for="message" class="form-label">Message</label>
+      <textarea id="message" class="form-control" rows="4" placeholder="Write your message here..."></textarea>
+    </div>
+
+    <!-- Checkboxes for Buttons -->
+    <div class="mb-3">
+      <label class="form-label">Include Button in Message</label>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault1">
+        <label class="form-check-label" for="flexRadioDefault1">
+          Link button
+        </label>
+        <input class="form-control" type="text">
+      </div>
+      <div class="form-check">
+        <input class="form-check-input" type="radio" name="flexRadioDefault" id="flexRadioDefault2" checked>
+        <label class="form-check-label" for="flexRadioDefault2">
+          Launch button
+        </label>
+      </div>
+    </div>
+
+    <!-- Submit Button -->
+    <button type="submit" class="btn btn-primary">Send Message</button>
+  </form>
+</div>
+{% endblock %}
+
+
+{% block scripts %}
+<script>
+
+</script>
+{% endblock %}

@@ -43,6 +43,12 @@ export class UsersController {
     };
   }
 
+  @Get('messages')
+  @Render('users/messages.html')
+  async message() {
+    return ""
+  }
+
   @Get(':id')
   @Render('users/view.html')
   async userViewPage(
@@ -54,8 +60,9 @@ export class UsersController {
       where: {
         id: userId,
       },
-      relations: ['wallet', 'completedTasks']
+      relations: ['wallet', 'completedTasks', 'boosts']
     });
+    console.log(user);
     if (!user) {
       createSessionError(req, ['User does not exits']);
       res.redirect(req.get('Referrer'));

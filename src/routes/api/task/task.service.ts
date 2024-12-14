@@ -46,18 +46,24 @@ export class TaskService {
       })
       .then((user) => user.completedTasks.map((t) => t.id));
 
-    return this.taskEntityRepository.find().then((result) => {
-      return (
-        result
-          .map((task) => ({
-            ...task,
-            isCompleted: completedTaskIds.includes(task.id),
-          }))
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          .sort((a, b) => a.isCompleted - b.isCompleted)
-      );
-    });
+    return this.taskEntityRepository
+      .find({
+        order: {
+          createdAt: 'DESC',
+        },
+      })
+      .then((result) => {
+        return (
+          result
+            .map((task) => ({
+              ...task,
+              isCompleted: completedTaskIds.includes(task.id),
+            }))
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            .sort((a, b) => a.isCompleted - b.isCompleted)
+        );
+      });
   }
 
   public async complete(

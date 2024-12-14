@@ -1,6 +1,6 @@
 import { join } from 'path';
 
-export const appVersion = '2.6.5';
+export const appVersion = '2.6.6';
 
 export const appPath =
   process.env.MODE === 'local'

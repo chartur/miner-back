@@ -16,6 +16,9 @@ import { TelegramHelper } from '../../../utils/telegram.helper';
 import { StarInvoiceTaskDetails } from '../../../core/models/interfaces/task-details/star-invoice-task.details';
 import { TelegramClient } from '../../../clients/telegram.client';
 import { TaskCompleteProps } from '../../../core/models/interfaces/invoice-props/task-complete.props';
+import { TaskAction } from '../../../core/models/enums/task-action';
+import { RefTaskDetails } from '../../../core/models/interfaces/task-details/ref-task.details';
+import { RefEntity } from '../../../entites/ref.entity';
 
 @Injectable()
 export class TaskService {
@@ -28,6 +31,8 @@ export class TaskService {
     private userEntityRepository: Repository<UserEntity>,
     @InjectRepository(InvoiceEntity)
     private invoiceEntityRepository: Repository<InvoiceEntity>,
+    @InjectRepository(RefEntity)
+    private refEntityRepository: Repository<RefEntity>,
     private configService: ConfigService,
     private telegramClient: TelegramClient,
   ) {}
@@ -46,18 +51,24 @@ export class TaskService {
       })
       .then((user) => user.completedTasks.map((t) => t.id));
 
-    return this.taskEntityRepository.find().then((result) => {
-      return (
-        result
-          .map((task) => ({
-            ...task,
-            isCompleted: completedTaskIds.includes(task.id),
-          }))
-          // eslint-disable-next-line @typescript-eslint/ban-ts-comment
-          // @ts-expect-error
-          .sort((a, b) => a.isCompleted - b.isCompleted)
-      );
-    });
+    return this.taskEntityRepository
+      .find({
+        order: {
+          createdAt: 'DESC',
+        },
+      })
+      .then((result) => {
+        return (
+          result
+            .map((task) => ({
+              ...task,
+              isCompleted: completedTaskIds.includes(task.id),
+            }))
+            // eslint-disable-next-line @typescript-eslint/ban-ts-comment
+            // @ts-expect-error
+            .sort((a, b) => a.isCompleted - b.isCompleted)
+        );
+      });
   }
 
   public async complete(
@@ -80,6 +91,27 @@ export class TaskService {
       throw new BadRequestException('You have already completed the task!');
     }
 
+    const task = await this.taskEntityRepository.findOneOrFail({
+      where: {
+        id: body.taskId,
+      },
+    });
+
+    if (task.action === TaskAction.REF) {
+      const details = task.details as RefTaskDetails;
+      const referralCount = await this.refEntityRepository.count({
+        where: {
+          referrer: {
+            id: user.id,
+          },
+        },
+      });
+
+      if (referralCount < details.count) {
+        throw new BadRequestException("You don't have enough friends invited");
+      }
+    }
+
     const userEntity = await this.userEntityRepository.findOneOrFail({
       where: {
         id: user.id,
@@ -87,12 +119,6 @@ export class TaskService {
       relations: {
         completedTasks: true,
         wallet: true,
-      },
-    });
-
-    const task = await this.taskEntityRepository.findOneOrFail({
-      where: {
-        id: body.taskId,
       },
     });
 

@@ -7,7 +7,8 @@ import { UserEntity } from '../../../entites/user.entity';
 import { WalletEntity } from '../../../entites/wallet.entity';
 import { InvoiceEntity } from '../../../entites/invoice.entity';
 import { ConfigModule } from '@nestjs/config';
-import { ClientsModule } from "../../../clients/clients.module";
+import { ClientsModule } from '../../../clients/clients.module';
+import { RefEntity } from '../../../entites/ref.entity';
 
 @Module({
   controllers: [TaskController],
@@ -20,6 +21,7 @@ import { ClientsModule } from "../../../clients/clients.module";
       UserEntity,
       WalletEntity,
       InvoiceEntity,
+      RefEntity,
     ]),
   ],
 })

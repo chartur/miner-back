@@ -13,7 +13,8 @@ import { BoostDetails } from '../../../entites/boost-details';
 import { TransactionEntity } from '../../../entites/transaction.entity';
 import { TaskEntity } from '../../../entites/task.entity';
 import { TelegramWebhookService } from './telegram-webhook.service';
-import { TaskService } from "../task/task.service";
+import { TaskService } from '../task/task.service';
+import { RefEntity } from '../../../entites/ref.entity';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { TaskService } from "../task/task.service";
       BoostDetails,
       TransactionEntity,
       TaskEntity,
+      RefEntity,
     ]),
     ConfigModule,
     ClientsModule,
